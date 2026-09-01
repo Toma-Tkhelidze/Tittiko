@@ -290,7 +290,16 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   z-index: -1;
 }
 .cover__emoji { font-size: clamp(2.4rem, 7vw, 3.6rem); filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .2)); }
-.cover__title { font-weight: 900; font-size: 1.06rem; line-height: 1.2; text-shadow: 0 2px 6px rgba(0, 0, 0, .22); }
+.cover__title {
+  font-weight: 900;
+  font-size: 1.06rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .22);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .cover__brand {
   align-self: flex-start;
   font-weight: 800;
@@ -374,14 +383,35 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 16px;
+  display: flex;
+  flex-direction: column;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .book-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
 .book-card.is-hidden { display: none; }
-.book-card__body { padding: 16px 6px 6px; }
-.book-card__body h3 { font-size: 1.12rem; }
+.book-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 16px 6px 6px;
+}
+.book-card__body h3 {
+  font-size: 1.12rem;
+  /* reserve two lines so titles of any length align the rows below them */
+  min-height: 2.4em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .book-card__meta { color: var(--muted); font-size: .88rem; margin: 6px 0 14px; }
-.book-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.book-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto; /* pin price + button to the bottom edge of every card */
+}
 .price { font-weight: 900; font-size: 1.25rem; color: var(--pink); }
 
 /* ============================================================
