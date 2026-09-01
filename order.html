@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>შეკვეთა — ტიტიკო</title>
+  <meta name="description" content="შეავსე ბავშვის მონაცემები და შეუკვეთე პერსონალიზებული წიგნი." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+  <noscript>
+    <style>[data-reveal] { opacity: 1 !important; transform: none !important; }</style>
+  </noscript>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a class="nav__logo" href="index.html" id="navLogo" aria-label="ტიტიკო — მთავარ გვერდზე დაბრუნება">
+        <img src="image/titiko logo.webp" alt="ტიტიკო" />
+      </a>
+      <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
+        <a href="books.html" class="nav__link is-active">წიგნები</a>
+        <a href="index.html#animations" class="nav__link">ანიმაციები</a>
+        <a href="index.html#contact" class="nav__link">კონტაქტი</a>
+      </nav>
+      <button class="nav__toggle" id="navToggle" aria-label="მენიუს გახსნა" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb breadcrumb--left" aria-label="breadcrumb">
+          <a href="index.html">მთავარი</a>
+          <span aria-hidden="true">/</span>
+          <a href="books.html">წიგნები</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page" id="orderCrumb">შეკვეთა</span>
+        </nav>
+
+        <!-- not-found fallback -->
+        <div class="book-notfound" id="orderNotFound" hidden>
+          <div class="empty-state__emoji">📚</div>
+          <h1>წიგნი ვერ მოიძებნა</h1>
+          <p>აირჩიე წიგნი კატალოგიდან.</p>
+          <a href="books.html" class="btn btn--primary">წიგნების ნახვა</a>
+        </div>
+
+        <!-- success -->
+        <div class="order-success" id="orderSuccess" hidden>
+          <div class="empty-state__emoji">🎉</div>
+          <h1>შეკვეთა მიღებულია!</h1>
+          <p>გმადლობთ! ჩვენი გუნდი 24 საათში დაგიკავშირდებათ დეტალების დასაზუსტებლად.</p>
+          <a href="books.html" class="btn btn--primary">სხვა წიგნების ნახვა</a>
+        </div>
+
+        <div class="order" id="orderWrap" data-reveal>
+          <!-- preview / summary -->
+          <aside class="order__aside">
+            <div class="cover cover--lg cover--c1" id="orderCover">
+              <span class="cover__emoji">📖</span>
+              <span class="cover__title">წიგნი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <p class="order__hero-line">გმირი: <strong id="previewName">შენი ბავშვი</strong></p>
+
+            <div class="summary">
+              <div class="summary__row"><span id="summaryBook">წიგნი</span><span id="summaryPrice">₾65</span></div>
+              <div class="summary__row"><span>მიწოდება</span><span>უფასო</span></div>
+              <div class="summary__row summary__total"><span>ჯამი</span><span id="summaryTotal">₾65</span></div>
+            </div>
+          </aside>
+
+          <!-- form -->
+          <form class="form" id="orderForm" action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" novalidate>
+            <h1 class="form__title">შეუკვეთე „<span id="orderBookTitle">წიგნი</span>“ <span class="form__price">— <span id="orderPrice">₾65</span></span></h1>
+
+            <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none !important" aria-hidden="true" />
+            <input type="hidden" name="book" value="" />
+            <input type="hidden" name="book_id" value="" />
+            <input type="hidden" name="price" value="" />
+
+            <!-- progress -->
+            <ol class="wizard__nav" id="wizardNav" aria-hidden="true">
+              <li class="is-active" data-step="1"><span class="wizard__dot">1</span> ბავშვი</li>
+              <li data-step="2"><span class="wizard__dot">2</span> გარეგნობა</li>
+              <li data-step="3"><span class="wizard__dot">3</span> წიგნი</li>
+              <li data-step="4"><span class="wizard__dot">4</span> მიწოდება</li>
+            </ol>
+
+            <!-- STEP 1 — child -->
+            <div class="wizard__step is-active" data-step="1">
+              <h2 class="wizard__heading">ვის ვუქმნით ისტორიას?</h2>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field__label">ბავშვის სახელი *</span>
+                  <input type="text" name="child_name" required autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span class="field__label">სახელი მოთხრობით ბრუნვაში</span>
+                  <input type="text" name="child_name_story" placeholder="მაგ. ნიკამ, ანამ" autocomplete="off" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field__label">ასაკი *</span>
+                  <select class="select" name="child_age" required>
+                    <option value="">აირჩიე</option>
+                    <option>2</option><option>3</option><option>4</option>
+                    <option>5</option><option>6</option><option>7</option><option>8</option>
+                  </select>
+                </label>
+                <div class="field">
+                  <span class="field__label">სქესი *</span>
+                  <div class="radio-group">
+                    <label class="radio-card"><input type="radio" name="child_gender" value="გოგო" required /><span>👧 გოგო</span></label>
+                    <label class="radio-card"><input type="radio" name="child_gender" value="ბიჭი" /><span>👦 ბიჭი</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2 — appearance -->
+            <div class="wizard__step" data-step="2">
+              <h2 class="wizard__heading">როგორ გამოიყურება გმირი?</h2>
+              <div class="field-row field-row--3">
+                <label class="field">
+                  <span class="field__label">თმის ფერი</span>
+                  <select class="select" name="hair_color">
+                    <option value="">—</option>
+                    <option>ქერა</option><option>წაბლისფერი</option><option>შავი</option>
+                    <option>წითური</option><option>ღია ყავისფერი</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field__label">კანის ტონი</span>
+                  <select class="select" name="skin_tone">
+                    <option value="">—</option>
+                    <option>ღია</option><option>საშუალო</option><option>მუქი</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span class="field__label">თვალის ფერი</span>
+                  <select class="select" name="eye_color">
+                    <option value="">—</option>
+                    <option>ყავისფერი</option><option>ცისფერი</option><option>მწვანე</option><option>რუხი</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <span class="field__label">ბავშვის ფოტო</span>
+                <label class="filebox">
+                  <input type="file" name="photo" accept="image/png,image/jpeg" />
+                  <span class="filebox__text">📷 აირჩიე ფოტო — JPG ან PNG, მაქს. 10 MB</span>
+                </label>
+                <p class="field__hint" id="photoInfo"></p>
+                <p class="field__hint">პორტრეტული ფოტო, სახე სრულად ჩანდეს, თავზე ქუდის გარეშე. ხარისხი გავლენას ახდენს გმირთან მსგავსებაზე.</p>
+              </div>
+            </div>
+
+            <!-- STEP 3 — book -->
+            <div class="wizard__step" data-step="3">
+              <h2 class="wizard__heading">წიგნის დეტალები</h2>
+              <div class="field">
+                <span class="field__label">ყდის ტიპი</span>
+                <div class="radio-group">
+                  <label class="radio-card"><input type="radio" name="cover_type" value="hard" checked /><span>მაგარი ყდა</span></label>
+                  <label class="radio-card"><input type="radio" name="cover_type" value="soft" /><span>რბილი ყდა</span></label>
+                </div>
+              </div>
+              <label class="field">
+                <span class="field__label">მიძღვნის ტექსტი (არასავალდებულო)</span>
+                <textarea name="dedication" rows="3" placeholder="მაგ. საყვარელო ნიკა, გილოცავ დაბადების დღეს!"></textarea>
+              </label>
+            </div>
+
+            <!-- STEP 4 — delivery -->
+            <div class="wizard__step" data-step="4">
+              <h2 class="wizard__heading">მიწოდება და კონტაქტი</h2>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field__label">თქვენი სახელი და გვარი *</span>
+                  <input type="text" name="customer_name" required autocomplete="name" />
+                </label>
+                <label class="field">
+                  <span class="field__label">ტელეფონი *</span>
+                  <input type="tel" name="phone" required autocomplete="tel" placeholder="+995 5xx xx xx xx" />
+                </label>
+              </div>
+              <label class="field">
+                <span class="field__label">ელ-ფოსტა *</span>
+                <input type="email" name="email" required autocomplete="email" />
+              </label>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field__label">ქალაქი *</span>
+                  <input type="text" name="city" required />
+                </label>
+                <label class="field">
+                  <span class="field__label">მისამართი *</span>
+                  <input type="text" name="address" required />
+                </label>
+              </div>
+              <label class="field">
+                <span class="field__label">კომენტარი (არასავალდებულო)</span>
+                <textarea name="comment" rows="2"></textarea>
+              </label>
+            </div>
+
+            <p class="form-status" id="orderStatus" role="status" aria-live="polite"></p>
+
+            <div class="form__actions">
+              <button type="button" class="btn btn--ghost" id="wizardBack" hidden>უკან</button>
+              <button type="button" class="btn btn--primary" id="wizardNext">შემდეგი</button>
+              <button type="submit" class="btn btn--primary" id="wizardSubmit" hidden>შეკვეთის გაგზავნა</button>
+            </div>
+            <p class="product__note">🔒 შენი მონაცემები გამოიყენება მხოლოდ ამ შეკვეთის დასამუშავებლად.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <img src="image/titiko logo.webp" alt="ტიტიკო" />
+          <p>პერსონალიზებული წიგნები და ანიმაციები, სადაც მთავარი გმირი შენი ბავშვია.</p>
+        </div>
+        <nav aria-label="ნავიგაცია">
+          <h4>ნავიგაცია</h4>
+          <a href="books.html">წიგნები</a>
+          <a href="index.html#animations">ანიმაციები</a>
+          <a href="index.html#how">როგორ მუშაობს</a>
+          <a href="index.html#reviews">შეფასებები</a>
+        </nav>
+        <nav aria-label="ინფორმაცია">
+          <h4>ინფორმაცია</h4>
+          <a href="index.html#faq">ხშირი კითხვები</a>
+          <a href="#">წესები და პირობები</a>
+          <a href="#">კონფიდენციალურობის პოლიტიკა</a>
+          <a href="#">მიწოდება და დაბრუნება</a>
+        </nav>
+        <div>
+          <h4>კონტაქტი</h4>
+          <a href="mailto:hello@tittiko.ge">hello@tittiko.ge</a>
+          <a href="tel:+995322000000">+995 32 2 000 000</a>
+          <div class="footer__social">
+            <a href="#" aria-label="Facebook">FB</a>
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="TikTok">TT</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bar">
+        <span>🔒 გადახდა დაცულია</span>
+        <span>ტიტიკო — © <span id="year">2026</span> ყველა უფლება დაცულია</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="ზემოთ დაბრუნება">↑</button>
+
+  <script src="script.js"></script>
+</body>
+</html>

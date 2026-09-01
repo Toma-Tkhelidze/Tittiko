@@ -251,10 +251,7 @@
 
       var orderBtn = document.getElementById("orderBtn");
       if (orderBtn) {
-        orderBtn.setAttribute(
-          "href",
-          "mailto:hello@tittiko.ge?subject=" + encodeURIComponent("შეკვეთა: " + book.title)
-        );
+        orderBtn.setAttribute("href", "order.html?id=" + encodeURIComponent(params.get("id")));
       }
 
       /* related books — same category first, then fill to 4 */
@@ -292,6 +289,191 @@
         relatedSection.hidden = false;
         wireBookCards(relatedSection);
       }
+    }
+  }
+
+  /* ============================================================
+     ORDER / PERSONALIZATION PAGE  (order.html)
+     ============================================================ */
+  var orderForm = document.getElementById("orderForm");
+  if (orderForm) {
+    /* --- 1. paste your Web3Forms access key here (free at https://web3forms.com) --- */
+    var WEB3FORMS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+
+    var oParams = new URLSearchParams(window.location.search);
+    var oBook = BOOKS[oParams.get("id")];
+    var orderNotFound = document.getElementById("orderNotFound");
+    var orderWrap = document.getElementById("orderWrap");
+
+    if (!oBook) {
+      if (orderWrap) orderWrap.hidden = true;
+      if (orderNotFound) orderNotFound.hidden = false;
+    } else {
+      var oSet = function (id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
+      };
+      var oVal = function (name, value) {
+        var el = orderForm.elements[name];
+        if (el) el.value = value;
+      };
+
+      document.title = "შეკვეთა: " + oBook.title + " — ტიტიკო";
+      oSet("orderCrumb", oBook.title);
+      oSet("orderBookTitle", oBook.title);
+      oSet("orderPrice", oBook.price);
+      oSet("summaryBook", oBook.title);
+      oSet("summaryPrice", oBook.price);
+      oSet("summaryTotal", oBook.price);
+
+      var oCover = document.getElementById("orderCover");
+      if (oCover) {
+        oCover.className = "cover cover--lg " + oBook.cover;
+        var oce = oCover.querySelector(".cover__emoji");
+        var oct = oCover.querySelector(".cover__title");
+        if (oce) oce.textContent = oBook.emoji;
+        if (oct) oct.textContent = oBook.title;
+      }
+
+      oVal("book", oBook.title);
+      oVal("book_id", oParams.get("id"));
+      oVal("price", oBook.price);
+
+      /* cover type from URL (?coverType=hard|soft) */
+      var coverType = oParams.get("coverType");
+      if (coverType && orderForm.elements.cover_type) {
+        var ctRadio = orderForm.querySelector('input[name="cover_type"][value="' + coverType + '"]');
+        if (ctRadio) ctRadio.checked = true;
+      }
+
+      /* live cover name preview */
+      var childName = orderForm.elements.child_name;
+      var previewName = document.getElementById("previewName");
+      if (childName && previewName) {
+        var updatePreview = function () {
+          var v = childName.value.trim();
+          previewName.textContent = v ? v : "შენი ბავშვი";
+        };
+        childName.addEventListener("input", updatePreview);
+        updatePreview();
+      }
+
+      /* photo: validate + show file name */
+      var photo = orderForm.elements.photo;
+      var photoInfo = document.getElementById("photoInfo");
+      if (photo) {
+        photo.addEventListener("change", function () {
+          var f = photo.files && photo.files[0];
+          if (!f) { if (photoInfo) photoInfo.textContent = ""; return; }
+          var okType = /image\/(jpe?g|png)/i.test(f.type);
+          var okSize = f.size <= 10 * 1024 * 1024;
+          if (!okType) {
+            if (photoInfo) photoInfo.textContent = "მხოლოდ JPG ან PNG ფორმატი.";
+            photo.value = "";
+          } else if (!okSize) {
+            if (photoInfo) photoInfo.textContent = "ფაილი 10 MB-ზე დიდია.";
+            photo.value = "";
+          } else if (photoInfo) {
+            photoInfo.textContent = "✓ " + f.name;
+          }
+        });
+      }
+
+      /* --- wizard steps --- */
+      var steps = Array.prototype.slice.call(orderForm.querySelectorAll(".wizard__step"));
+      var navItems = Array.prototype.slice.call(orderForm.querySelectorAll(".wizard__nav li"));
+      var backBtn = document.getElementById("wizardBack");
+      var nextBtn = document.getElementById("wizardNext");
+      var wizardSubmitBtn = document.getElementById("wizardSubmit");
+      var currentStep = 0;
+
+      function showStep(i) {
+        currentStep = i;
+        steps.forEach(function (s, idx) { s.classList.toggle("is-active", idx === i); });
+        navItems.forEach(function (n, idx) {
+          n.classList.toggle("is-active", idx === i);
+          n.classList.toggle("is-done", idx < i);
+        });
+        var last = i === steps.length - 1;
+        if (backBtn) backBtn.hidden = i === 0;
+        if (nextBtn) nextBtn.hidden = last;
+        if (wizardSubmitBtn) wizardSubmitBtn.hidden = !last;
+        var st = document.getElementById("orderStatus");
+        if (st) { st.textContent = ""; st.className = "form-status"; }
+        orderForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function validateStep(i) {
+        var fields = steps[i].querySelectorAll("input, select, textarea");
+        for (var k = 0; k < fields.length; k++) {
+          if (!fields[k].checkValidity()) {
+            fields[k].reportValidity();
+            return false;
+          }
+        }
+        return true;
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+          if (validateStep(currentStep)) showStep(currentStep + 1);
+        });
+      }
+      if (backBtn) {
+        backBtn.addEventListener("click", function () {
+          showStep(Math.max(0, currentStep - 1));
+        });
+      }
+      navItems.forEach(function (n, idx) {
+        n.addEventListener("click", function () {
+          if (idx < currentStep) showStep(idx);
+        });
+      });
+      showStep(0);
+
+      /* submit */
+      orderForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (currentStep !== steps.length - 1) return;
+        var status = document.getElementById("orderStatus");
+        var submitBtn = document.getElementById("wizardSubmit");
+
+        if (!WEB3FORMS_KEY || WEB3FORMS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY") {
+          if (status) {
+            status.className = "form-status form-status--warn";
+            status.textContent = "ფორმა მზადაა, თუმცა ჯერ არ არის დაკავშირებული. დაამატე Web3Forms-ის access key script.js-ში (WEB3FORMS_KEY).";
+          }
+          return;
+        }
+
+        var data = new FormData(orderForm);
+        data.append("access_key", WEB3FORMS_KEY);
+        data.append("subject", "ახალი შეკვეთა: " + oBook.title);
+        data.append("from_name", "ტიტიკო — ვებსაიტი");
+
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "იგზავნება…"; }
+        if (status) { status.className = "form-status"; status.textContent = ""; }
+
+        fetch("https://api.web3forms.com/submit", { method: "POST", body: data })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (res.success) {
+              var wrap = document.getElementById("orderWrap");
+              var done = document.getElementById("orderSuccess");
+              if (wrap) wrap.hidden = true;
+              if (done) { done.hidden = false; done.scrollIntoView({ behavior: "smooth" }); }
+            } else {
+              throw new Error(res.message || "შეცდომა");
+            }
+          })
+          .catch(function (err) {
+            if (status) {
+              status.className = "form-status form-status--err";
+              status.textContent = "გაგზავნა ვერ მოხერხდა: " + err.message + ". სცადე თავიდან ან დაგვირეკე.";
+            }
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "შეკვეთის გაგზავნა"; }
+          });
+      });
     }
   }
 
