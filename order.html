@@ -25,7 +25,7 @@
       </a>
       <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
         <a href="books.html" class="nav__link is-active">წიგნები</a>
-        <a href="index.html#animations" class="nav__link">ანიმაციები</a>
+        <a href="animations.html" class="nav__link">ანიმაციები</a>
         <a href="index.html#contact" class="nav__link">კონტაქტი</a>
       </nav>
       <button class="nav__toggle" id="navToggle" aria-label="მენიუს გახსნა" aria-expanded="false" aria-controls="navMenu">
@@ -40,7 +40,7 @@
         <nav class="breadcrumb breadcrumb--left" aria-label="breadcrumb">
           <a href="index.html">მთავარი</a>
           <span aria-hidden="true">/</span>
-          <a href="books.html">წიგნები</a>
+          <a href="books.html" id="orderCatLink">წიგნები</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page" id="orderCrumb">შეკვეთა</span>
         </nav>
@@ -64,10 +64,12 @@
         <div class="order" id="orderWrap" data-reveal>
           <!-- preview / summary -->
           <aside class="order__aside">
-            <div class="cover cover--lg cover--c1" id="orderCover">
-              <span class="cover__emoji">📖</span>
-              <span class="cover__title">წიგნი</span>
-              <span class="cover__brand">ტიტიკო</span>
+            <div class="order__media" id="orderMedia">
+              <div class="cover cover--lg cover--c1" id="orderCover">
+                <span class="cover__emoji">📖</span>
+                <span class="cover__title">წიგნი</span>
+                <span class="cover__brand">ტიტიკო</span>
+              </div>
             </div>
             <p class="order__hero-line">გმირი: <strong id="previewName">შენი ბავშვი</strong></p>
 
@@ -86,6 +88,7 @@
             <input type="hidden" name="book" value="" />
             <input type="hidden" name="book_id" value="" />
             <input type="hidden" name="price" value="" />
+            <input type="hidden" name="order_type" value="წიგნი" />
 
             <!-- progress -->
             <ol class="wizard__nav" id="wizardNav" aria-hidden="true">
@@ -165,9 +168,9 @@
               </div>
             </div>
 
-            <!-- STEP 3 — book -->
+            <!-- STEP 3 — book / extra -->
             <div class="wizard__step" data-step="3">
-              <h2 class="wizard__heading">წიგნის დეტალები</h2>
+              <h2 class="wizard__heading" id="stepBookHeading">წიგნის დეტალები</h2>
               <div class="field">
                 <span class="field__label">ყდის ტიპი</span>
                 <div class="radio-group">
@@ -183,7 +186,7 @@
 
             <!-- STEP 4 — delivery -->
             <div class="wizard__step" data-step="4">
-              <h2 class="wizard__heading">მიწოდება და კონტაქტი</h2>
+              <h2 class="wizard__heading" id="stepDeliveryHeading">მიწოდება და კონტაქტი</h2>
               <div class="field-row">
                 <label class="field">
                   <span class="field__label">თქვენი სახელი და გვარი *</span>
@@ -198,7 +201,7 @@
                 <span class="field__label">ელ-ფოსტა *</span>
                 <input type="email" name="email" required autocomplete="email" />
               </label>
-              <div class="field-row">
+              <div class="field-row" id="orderAddressRow">
                 <label class="field">
                   <span class="field__label">ქალაქი *</span>
                   <input type="text" name="city" required />
@@ -221,7 +224,7 @@
               <button type="button" class="btn btn--primary" id="wizardNext">შემდეგი</button>
               <button type="submit" class="btn btn--primary" id="wizardSubmit" hidden>შეკვეთის გაგზავნა</button>
             </div>
-            <p class="product__note">🔒 შენი მონაცემები გამოიყენება მხოლოდ ამ შეკვეთის დასამუშავებლად.</p>
+            <p class="product__note" id="orderPrivacyNote">🔒 შენი მონაცემები გამოიყენება მხოლოდ ამ შეკვეთის დასამუშავებლად.</p>
           </form>
         </div>
       </div>
@@ -239,7 +242,7 @@
         <nav aria-label="ნავიგაცია">
           <h4>ნავიგაცია</h4>
           <a href="books.html">წიგნები</a>
-          <a href="index.html#animations">ანიმაციები</a>
+          <a href="animations.html">ანიმაციები</a>
           <a href="index.html#how">როგორ მუშაობს</a>
           <a href="index.html#reviews">შეფასებები</a>
         </nav>

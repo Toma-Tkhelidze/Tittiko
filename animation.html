@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>წიგნი — ტიტიკო</title>
-  <meta name="description" content="პერსონალიზებული წიგნის აღწერა — მთავარი გმირი შენი ბავშვია." />
+  <title>ანიმაცია — ტიტიკო</title>
+  <meta name="description" content="პერსონალიზებული ანიმაციის აღწერა — მთავარ როლში შენი ბავშვია." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,8 +25,8 @@
       </a>
 
       <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
-        <a href="books.html" class="nav__link is-active">წიგნები</a>
-        <a href="animations.html" class="nav__link">ანიმაციები</a>
+        <a href="books.html" class="nav__link">წიგნები</a>
+        <a href="animations.html" class="nav__link is-active">ანიმაციები</a>
         <a href="index.html#contact" class="nav__link">კონტაქტი</a>
       </nav>
 
@@ -43,59 +43,58 @@
         <nav class="breadcrumb breadcrumb--left" aria-label="breadcrumb">
           <a href="index.html">მთავარი</a>
           <span aria-hidden="true">/</span>
-          <a href="books.html">წიგნები</a>
+          <a href="animations.html">ანიმაციები</a>
           <span aria-hidden="true">/</span>
-          <span aria-current="page" id="bookCrumb">წიგნი</span>
+          <span aria-current="page" id="animCrumb">ანიმაცია</span>
         </nav>
 
         <!-- not-found fallback -->
-        <div class="book-notfound" id="bookNotFound" hidden>
-          <div class="empty-state__emoji">📚</div>
-          <h1>წიგნი ვერ მოიძებნა</h1>
+        <div class="book-notfound" id="animNotFound" hidden>
+          <div class="empty-state__emoji">🎬</div>
+          <h1>ანიმაცია ვერ მოიძებნა</h1>
           <p>სცადე კატალოგიდან არჩევა.</p>
-          <a href="books.html" class="btn btn--primary">წიგნების ნახვა</a>
+          <a href="animations.html" class="btn btn--primary">ანიმაციების ნახვა</a>
         </div>
 
         <!-- product -->
-        <div class="product" id="bookContent" data-book-page data-reveal>
+        <div class="product" id="animContent" data-animation-page data-reveal>
           <div class="product__media">
-            <div class="cover cover--lg cover--c1" id="bookCover">
-              <span class="cover__emoji">📖</span>
-              <span class="cover__title">წიგნი</span>
-              <span class="cover__brand">ტიტიკო</span>
+            <div class="anim-thumb anim-thumb--lg anim-thumb--a" id="animThumb">
+              <button class="play" type="button" aria-label="ნახვა">▶</button>
+              <span class="anim-thumb__label">ანიმაცია</span>
             </div>
           </div>
 
           <div class="product__info">
-            <h1 class="product__title" id="bookTitle">წიგნი</h1>
-            <div class="product__price" id="bookPrice">₾65</div>
-            <p class="product__blurb" id="bookBlurb"></p>
+            <h1 class="product__title" id="animTitle">ანიმაცია</h1>
+            <div class="product__price" id="animPrice">₾45</div>
+            <p class="product__blurb" id="animBlurb"></p>
 
             <ul class="product__meta">
-              <li class="feat"><span class="feat__icon">👶</span><span id="bookAge">ასაკი 2–8</span></li>
-              <li class="feat"><span class="feat__icon">🖨️</span><span>იბეჭდება 7–10 დღეში</span></li>
-              <li class="feat"><span class="feat__icon">🎁</span><span>სასაჩუქრე შეფუთვა უფასოდ</span></li>
+              <li class="feat"><span class="feat__icon">⏱️</span><span id="animDuration">3–5 წთ</span></li>
+              <li class="feat"><span class="feat__icon">👶</span><span id="animAge">ასაკი 2–8</span></li>
+              <li class="feat"><span class="feat__icon">📱</span><span>ციფრული ფაილი — MP4, HD ხარისხი</span></li>
             </ul>
 
             <div class="product__actions">
-              <a href="index.html#contact" class="btn btn--primary" id="orderBtn">შეუკვეთე წიგნი</a>
-              <a href="books.html" class="btn btn--ghost">სხვა წიგნები</a>
+              <a href="order.html" class="btn btn--primary" id="animOrderBtn">შეუკვეთე ანიმაცია</a>
+              <a href="animations.html" class="btn btn--ghost">სხვა ანიმაციები</a>
             </div>
 
-            <p class="product__note">🔒 უსაფრთხო გადახდა · 🚚 მიწოდება მთელ საქართველოში</p>
+            <p class="product__note">🔒 უსაფრთხო გადახდა · 📩 ფაილს მიიღებ ელფოსტაზე</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- related -->
-    <section class="section section--wash" id="related" hidden>
+    <section class="section section--wash" id="animRelated" hidden>
       <div class="container">
         <header class="section__head" data-reveal>
           <span class="eyebrow">შეიძლება მოგეწონოს</span>
-          <h2 class="section__title">სხვა წიგნები</h2>
+          <h2 class="section__title">სხვა ანიმაციები</h2>
         </header>
-        <div class="book-grid" id="relatedGrid"></div>
+        <div class="book-grid" id="animRelatedGrid"></div>
       </div>
     </section>
 
@@ -107,7 +106,7 @@
           <div class="blob blob--c2"></div>
           <h2>დაიწყე შენი პატარას ისტორია დღესვე</h2>
           <p>რამდენიმე წუთში შექმნი საჩუქარს, რომელსაც ბავშვი წლების შემდეგაც გაიხსენებს.</p>
-          <a href="books.html" class="btn btn--yellow">ყველა წიგნის ნახვა</a>
+          <a href="animations.html" class="btn btn--yellow">ყველა ანიმაციის ნახვა</a>
         </div>
       </div>
     </section>

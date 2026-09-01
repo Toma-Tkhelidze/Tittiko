@@ -786,9 +786,12 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .anim-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+.anim-card.is-hidden { display: none; }
 .anim-thumb {
   position: relative;
   aspect-ratio: 16 / 10;
@@ -798,14 +801,26 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .anim-thumb--a { background: linear-gradient(150deg, var(--pink), var(--orange)); }
 .anim-thumb--b { background: linear-gradient(150deg, #6a4bd0, var(--pink)); }
 .anim-thumb--c { background: linear-gradient(150deg, var(--yellow), var(--orange-red)); }
+.anim-thumb--d { background: linear-gradient(150deg, #16b3c7, var(--pink)); }
+.anim-thumb--e { background: linear-gradient(150deg, var(--orange-red), #7a4bd0); }
+.anim-thumb--f { background: linear-gradient(150deg, var(--yellow), var(--pink)); }
+.anim-thumb--lg {
+  aspect-ratio: 3 / 4;
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+}
 .anim-thumb__label {
   position: absolute;
   left: 16px; bottom: 14px;
+  right: 16px;
   color: #fff;
   font-weight: 900;
   font-size: 1.1rem;
   text-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
+.anim-thumb--lg .anim-thumb__label { font-size: clamp(1.3rem, 3.4vw, 2rem); }
 .play {
   width: 64px; height: 64px;
   border-radius: 50%;
@@ -818,9 +833,15 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   transition: transform .18s ease;
 }
 .play:hover { transform: scale(1.08); }
-.anim-card__body { padding: 20px; }
+.anim-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 20px;
+}
 .anim-card__body h3 { font-size: 1.12rem; margin-bottom: 4px; }
-.anim-card__body .btn { margin-top: 12px; }
+.anim-card__body .book-card__meta { margin-bottom: 14px; }
+.anim-card__body .book-card__foot { margin-top: auto; }
 
 /* ============================================================
    HOW IT WORKS

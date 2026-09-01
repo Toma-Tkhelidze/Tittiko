@@ -26,7 +26,7 @@
 
       <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
         <a href="books.html" class="nav__link">წიგნები</a>
-        <a href="#animations" class="nav__link">ანიმაციები</a>
+        <a href="animations.html" class="nav__link">ანიმაციები</a>
         <a href="#contact" class="nav__link">კონტაქტი</a>
       </nav>
 
@@ -54,7 +54,7 @@
           </p>
           <div class="hero__actions">
             <a href="books.html" class="btn btn--primary">წიგნის პერსონალიზაცია</a>
-            <a href="#animations" class="btn btn--ghost">ანიმაციების ნახვა</a>
+            <a href="animations.html" class="btn btn--ghost">ანიმაციების ნახვა</a>
           </div>
           <ul class="hero__stats">
             <li><strong>12 000+</strong><span>ბედნიერი ბავშვი</span></li>
@@ -195,39 +195,52 @@
         <div class="anim-grid">
           <article class="anim-card" data-reveal>
             <div class="anim-thumb anim-thumb--a">
-              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <button class="play" type="button" aria-label="ნახვა">▶</button>
               <span class="anim-thumb__label">შენ ხარ გმირი</span>
             </div>
             <div class="anim-card__body">
               <h3>შენ ხარ გმირი</h3>
               <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
-              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+              <div class="book-card__foot">
+                <span class="price">₾45</span>
+                <a href="#" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
             </div>
           </article>
 
           <article class="anim-card" data-reveal>
             <div class="anim-thumb anim-thumb--b">
-              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <button class="play" type="button" aria-label="ნახვა">▶</button>
               <span class="anim-thumb__label">ცისფერი პლანეტა</span>
             </div>
             <div class="anim-card__body">
               <h3>ცისფერი პლანეტა</h3>
               <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
-              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+              <div class="book-card__foot">
+                <span class="price">₾45</span>
+                <a href="#" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
             </div>
           </article>
 
           <article class="anim-card" data-reveal>
             <div class="anim-thumb anim-thumb--c">
-              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <button class="play" type="button" aria-label="ნახვა">▶</button>
               <span class="anim-thumb__label">გაზაფხულის ზეიმი</span>
             </div>
             <div class="anim-card__body">
               <h3>გაზაფხულის ზეიმი</h3>
               <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
-              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+              <div class="book-card__foot">
+                <span class="price">₾45</span>
+                <a href="#" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
             </div>
           </article>
+        </div>
+
+        <div class="section__more" data-reveal>
+          <a href="animations.html" class="btn btn--primary">ყველა ანიმაციის ნახვა</a>
         </div>
       </div>
     </section>
@@ -356,7 +369,7 @@
         <nav aria-label="ნავიგაცია">
           <h4>ნავიგაცია</h4>
           <a href="books.html">წიგნები</a>
-          <a href="#animations">ანიმაციები</a>
+          <a href="animations.html">ანიმაციები</a>
           <a href="#how">როგორ მუშაობს</a>
           <a href="#reviews">შეფასებები</a>
         </nav>

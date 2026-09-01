@@ -96,14 +96,15 @@
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
 
-  /* ---------- book filter + search + sort ---------- */
+  /* ---------- catalog filter + search + sort (books.html & animations.html) ---------- */
   var filters = document.querySelectorAll(".filter");
-  var bookGrid = document.getElementById("bookGrid");
-  var cards = bookGrid ? bookGrid.querySelectorAll(".book-card") : [];
+  var bookGrid = document.getElementById("bookGrid") || document.getElementById("animGrid");
+  var cards = bookGrid ? bookGrid.querySelectorAll(".book-card, .anim-card") : [];
   var searchInput = document.getElementById("bookSearch");
   var sortSelect = document.getElementById("bookSort");
   var resultCount = document.getElementById("resultCount");
   var emptyState = document.getElementById("emptyState");
+  var resultUnit = resultCount ? (resultCount.dataset.unit || "წიგნი") : "წიგნი";
   var activeFilter = "all";
   var originalOrder = Array.prototype.slice.call(cards);
 
@@ -122,7 +123,7 @@
       card.classList.toggle("is-hidden", !show);
       if (show) visible++;
     });
-    if (resultCount) resultCount.innerHTML = "ნაპოვნია <strong>" + visible + "</strong> წიგნი";
+    if (resultCount) resultCount.innerHTML = "ნაპოვნია <strong>" + visible + "</strong> " + resultUnit;
     if (emptyState) emptyState.hidden = visible !== 0;
   }
 
@@ -293,6 +294,119 @@
   }
 
   /* ============================================================
+     ANIMATION CATALOG DATA
+     ============================================================ */
+  var ANIMATIONS = {
+    hero:     { title: "შენ ხარ გმირი", emoji: "🦸", thumb: "anim-thumb--a", cat: "adventure", age: "2–8", duration: "3–5 წთ", price: "₾45",
+      blurb: "შენი ბავშვი მთავარ როლში — ის ქალაქს გადაარჩენს, დაეხმარება მეგობრებს და მიხვდება, რომ ნამდვილი ზესახელა კეთილი გულია. სახელი, გარეგნობა და ხმაც კი მასზეა მორგებული." },
+    planet:   { title: "ცისფერი პლანეტა", emoji: "🌍", thumb: "anim-thumb--b", cat: "learn", age: "2–8", duration: "3–5 წთ", price: "₾45",
+      blurb: "პატარა მკვლევარი კოსმოსური ხომალდით დედამიწას გარშემოუვლის და ხედავს, რა მშვენიერი და მყიფეა ჩვენი ცისფერი პლანეტა. გზად სწავლობს, როგორ გავუფრთხილდეთ ბუნებას." },
+    spring:   { title: "გაზაფხულის ზეიმი", emoji: "🌸", thumb: "anim-thumb--c", cat: "seasonal", age: "2–8", duration: "3–5 წთ", price: "₾45",
+      blurb: "თოვლი დნება და ბაღი იღვიძებს — შენი ბავშვი ფერიებს ეხმარება ყვავილების გაფურჩქვნასა და პეპლების გამოღვიძებაში. ფერადი, მხიარული და სითბოთი სავსე ისტორია." },
+    starways: { title: "ვარსკვლავური მოგზაურობა", emoji: "🚀", thumb: "anim-thumb--d", cat: "adventure", age: "2–8", duration: "4–6 წთ", price: "₾45",
+      blurb: "რაკეტა ეშვება და შენი პატარა ასტრონავტი ვარსკვლავებს შორის მიფრინავს. ის აღმოაჩენს ახალ პლანეტებს, მეგობრდება რობოტთან და მიხვდება, რომ ცნობისმოყვარეობა უსაზღვროა." },
+    sea:      { title: "ზღვის სიღრმეში", emoji: "🐬", thumb: "anim-thumb--e", cat: "learn", age: "2–8", duration: "3–5 წთ", price: "₾45",
+      blurb: "ღრმა ოკეანეში, ფერად რიფებს შორის, შენი ბავშვი დელფინებთან ერთად ცურავს და პოულობს დაკარგულ საგანძურს. თან სწავლობს, რატომ არის ზღვის სისუფთავე ასე მნიშვნელოვანი." },
+    birthday: { title: "დაბადების დღის სასწაული", emoji: "🎂", thumb: "anim-thumb--f", cat: "seasonal", age: "2–8", duration: "3–5 წთ", price: "₾45",
+      blurb: "დაბადების დღის დილას შენს ბავშვს ჯადოსნური სტუმრები ეწვევიან და დღეს დაუვიწყარს გახდიან. სახელით მოძღვნილი სიმღერითა და ტორტით — იდეალური საჩუქარი." }
+  };
+
+  var animTitleToId = {};
+  Object.keys(ANIMATIONS).forEach(function (id) { animTitleToId[ANIMATIONS[id].title.trim()] = id; });
+
+  function wireAnimCards(scope) {
+    (scope || document).querySelectorAll(".anim-card").forEach(function (card) {
+      if (card.dataset.wired) return;
+      var id = card.dataset.id;
+      if (!id) {
+        var h3 = card.querySelector("h3");
+        var t = (card.dataset.title || (h3 ? h3.textContent : "") || "").trim();
+        id = animTitleToId[t] || null;
+      }
+      if (!id) return;
+      var href = "animation.html?id=" + encodeURIComponent(id);
+      var btn = card.querySelector(".btn");
+      if (btn) btn.setAttribute("href", href);
+      card.classList.add("book-card--link");
+      card.addEventListener("click", function (e) {
+        if (e.target.closest("a") || e.target.closest("button")) return;
+        window.location.href = href;
+      });
+      card.dataset.wired = "1";
+    });
+  }
+  wireAnimCards();
+
+  /* ---------- animation detail page (animation.html) ---------- */
+  var animPage = document.querySelector("[data-animation-page]");
+  if (animPage) {
+    var aParams = new URLSearchParams(window.location.search);
+    var anim = ANIMATIONS[aParams.get("id")];
+    var animNotFound = document.getElementById("animNotFound");
+
+    if (!anim) {
+      animPage.hidden = true;
+      if (animNotFound) animNotFound.hidden = false;
+    } else {
+      var aSet = function (id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
+      };
+      document.title = anim.title + " — ტიტიკო";
+      aSet("animCrumb", anim.title);
+      aSet("animTitle", anim.title);
+      aSet("animPrice", anim.price);
+      aSet("animBlurb", anim.blurb);
+      aSet("animAge", "ასაკი " + anim.age);
+      aSet("animDuration", anim.duration);
+
+      var aThumb = document.getElementById("animThumb");
+      if (aThumb) {
+        aThumb.className = "anim-thumb anim-thumb--lg " + anim.thumb;
+        var albl = aThumb.querySelector(".anim-thumb__label");
+        if (albl) albl.textContent = anim.title;
+      }
+
+      var animOrderBtn = document.getElementById("animOrderBtn");
+      if (animOrderBtn) {
+        animOrderBtn.setAttribute("href", "order.html?type=animation&id=" + encodeURIComponent(aParams.get("id")));
+      }
+
+      var animRelGrid = document.getElementById("animRelatedGrid");
+      var animRelSec = document.getElementById("animRelated");
+      if (animRelGrid && animRelSec) {
+        var curAnim = aParams.get("id");
+        var animIds = Object.keys(ANIMATIONS).filter(function (id) { return id !== curAnim; });
+        animIds.sort(function (a, b) {
+          return (ANIMATIONS[a].cat === anim.cat ? 0 : 1) - (ANIMATIONS[b].cat === anim.cat ? 0 : 1);
+        });
+        animIds.slice(0, 3).forEach(function (id) {
+          var an = ANIMATIONS[id];
+          var art = document.createElement("article");
+          art.className = "anim-card";
+          art.dataset.id = id;
+          art.innerHTML =
+            '<div class="anim-thumb ' + an.thumb + '">' +
+              '<button class="play" type="button" aria-label="ნახვა">▶</button>' +
+              '<span class="anim-thumb__label">' + an.title + '</span>' +
+            '</div>' +
+            '<div class="anim-card__body">' +
+              '<h3>' + an.title + '</h3>' +
+              '<p class="book-card__meta">' + an.duration + ' · ასაკი ' + an.age + '</p>' +
+              '<div class="book-card__foot">' +
+                '<span class="price">' + an.price + '</span>' +
+                '<a href="#" class="btn btn--primary btn--sm">პერსონალიზება</a>' +
+              '</div>' +
+            '</div>';
+          animRelGrid.appendChild(art);
+        });
+        animRelSec.hidden = false;
+        wireAnimCards(animRelSec);
+      }
+    }
+  }
+
+  /* ============================================================
      ORDER / PERSONALIZATION PAGE  (order.html)
      ============================================================ */
   var orderForm = document.getElementById("orderForm");
@@ -301,11 +415,13 @@
     var WEB3FORMS_KEY = "2f585767-f8ed-4be7-96fa-b67bc037ebc0";
 
     var oParams = new URLSearchParams(window.location.search);
-    var oBook = BOOKS[oParams.get("id")];
+    var oIsAnim = oParams.get("type") === "animation";
+    var oItem = (oIsAnim ? ANIMATIONS : BOOKS)[oParams.get("id")];
+    var oKind = oIsAnim ? "ანიმაცია" : "წიგნი";
     var orderNotFound = document.getElementById("orderNotFound");
     var orderWrap = document.getElementById("orderWrap");
 
-    if (!oBook) {
+    if (!oItem) {
       if (orderWrap) orderWrap.hidden = true;
       if (orderNotFound) orderNotFound.hidden = false;
     } else {
@@ -318,32 +434,64 @@
         if (el) el.value = value;
       };
 
-      document.title = "შეკვეთა: " + oBook.title + " — ტიტიკო";
-      oSet("orderCrumb", oBook.title);
-      oSet("orderBookTitle", oBook.title);
-      oSet("orderPrice", oBook.price);
-      oSet("summaryBook", oBook.title);
-      oSet("summaryPrice", oBook.price);
-      oSet("summaryTotal", oBook.price);
+      document.title = "შეკვეთა: " + oItem.title + " — ტიტიკო";
+      oSet("orderCrumb", oItem.title);
+      oSet("orderBookTitle", oItem.title);
+      oSet("orderPrice", oItem.price);
+      oSet("summaryBook", oItem.title);
+      oSet("summaryPrice", oItem.price);
+      oSet("summaryTotal", oItem.price);
 
-      var oCover = document.getElementById("orderCover");
-      if (oCover) {
-        oCover.className = "cover cover--lg " + oBook.cover;
-        var oce = oCover.querySelector(".cover__emoji");
-        var oct = oCover.querySelector(".cover__title");
-        if (oce) oce.textContent = oBook.emoji;
-        if (oct) oct.textContent = oBook.title;
+      var oMedia = document.getElementById("orderMedia");
+      if (oMedia) {
+        if (oIsAnim) {
+          oMedia.innerHTML =
+            '<div class="anim-thumb anim-thumb--lg ' + oItem.thumb + '">' +
+              '<button class="play" type="button" aria-label="ნახვა">▶</button>' +
+              '<span class="anim-thumb__label">' + oItem.title + '</span>' +
+            '</div>';
+        } else {
+          var oCover = document.getElementById("orderCover");
+          if (oCover) {
+            oCover.className = "cover cover--lg " + oItem.cover;
+            var oce = oCover.querySelector(".cover__emoji");
+            var oct = oCover.querySelector(".cover__title");
+            if (oce) oce.textContent = oItem.emoji;
+            if (oct) oct.textContent = oItem.title;
+          }
+        }
       }
 
-      oVal("book", oBook.title);
+      oVal("book", oItem.title);
       oVal("book_id", oParams.get("id"));
-      oVal("price", oBook.price);
+      oVal("price", oItem.price);
+      oVal("order_type", oKind);
 
-      /* cover type from URL (?coverType=hard|soft) */
-      var coverType = oParams.get("coverType");
-      if (coverType && orderForm.elements.cover_type) {
-        var ctRadio = orderForm.querySelector('input[name="cover_type"][value="' + coverType + '"]');
-        if (ctRadio) ctRadio.checked = true;
+      var catLink = document.getElementById("orderCatLink");
+      if (catLink) {
+        catLink.textContent = oIsAnim ? "ანიმაციები" : "წიგნები";
+        catLink.setAttribute("href", oIsAnim ? "animations.html" : "books.html");
+      }
+
+      if (oIsAnim) {
+        /* animation = digital product: drop cover type + physical delivery */
+        var ctField = orderForm.querySelector('[name="cover_type"]');
+        if (ctField && ctField.closest(".field")) ctField.closest(".field").hidden = true;
+        var addrRow = document.getElementById("orderAddressRow");
+        if (addrRow) {
+          addrRow.hidden = true;
+          addrRow.querySelectorAll("input").forEach(function (i) { i.required = false; });
+        }
+        oSet("stepBookHeading", "დამატებითი დეტალები");
+        oSet("stepDeliveryHeading", "კონტაქტი");
+        oSet("orderPrivacyNote", "🔒 ციფრულ ფაილს (MP4) გამოგიგზავნით მითითებულ ელფოსტაზე.");
+      } else {
+        /* cover type from URL (?coverType=hard|soft) */
+        var coverType = oParams.get("coverType");
+        if (coverType && orderForm.elements.cover_type) {
+          var ctRadio = orderForm.querySelector('input[name="cover_type"][value="' + coverType + '"]');
+          if (ctRadio) ctRadio.checked = true;
+        }
       }
 
       /* live cover name preview */
@@ -448,7 +596,7 @@
 
         var data = new FormData(orderForm);
         data.append("access_key", WEB3FORMS_KEY);
-        data.append("subject", "ახალი შეკვეთა: " + oBook.title);
+        data.append("subject", "ახალი შეკვეთა (" + oKind + "): " + oItem.title);
         data.append("from_name", "ტიტიკო — ვებსაიტი");
 
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "იგზავნება…"; }
