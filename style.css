@@ -143,7 +143,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   justify-content: space-between;
   gap: 20px;
 }
-.nav__logo img { height: 40px; width: auto; }
+.nav__logo img { height: 50px; width: auto; }
 .nav__logo { flex-shrink: 0; }
 
 .nav__menu { display: flex; align-items: center; gap: 6px; }
@@ -157,7 +157,6 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 }
 .nav__link:hover { color: var(--pink); background: rgba(242, 9, 101, .08); }
 .nav__link.is-active { color: var(--pink); }
-.nav__cta { margin-left: 10px; }
 
 .nav__toggle {
   display: none;
@@ -656,7 +655,6 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 @media (max-width: 1024px) {
   :root { --nav-h: 70px; }
   .nav__link { padding: 10px 11px; font-size: .94rem; }
-  .nav__cta { margin-left: 4px; }
   .hero__title { font-size: clamp(2.4rem, 6vw, 3.6rem); }
   .hero__lead { font-size: 1.05rem; }
   .steps { gap: 20px; }
@@ -718,7 +716,6 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   .nav__menu.is-open { transform: translateY(0); opacity: 1; pointer-events: auto; }
   .nav__link { padding: 13px 14px; font-size: 1rem; }
   .nav__link.is-active { background: rgba(242, 9, 101, .08); }
-  .nav__cta { margin: 6px 0 0; }
 
   .section__sub { font-size: 1rem; }
   .filters { margin-bottom: 32px; gap: 8px; }
@@ -764,7 +761,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 /* ---- Very small phone (≤360px) ---- */
 @media (max-width: 360px) {
   .book-grid { grid-template-columns: minmax(0, 1fr); }
-  .nav__logo img { height: 34px; }
+  .nav__logo img { height: 42px; }
   .section__title { font-size: 1.7rem; }
   .hero__title { font-size: 2rem; }
   .cta-card { border-radius: 24px; padding: 40px 18px; }
