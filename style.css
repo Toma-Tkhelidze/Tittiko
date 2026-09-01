@@ -72,6 +72,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .section__head { text-align: center; max-width: 680px; margin: 0 auto clamp(36px, 5vw, 56px); }
 .section__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 10px 0 14px; }
 .section__sub { color: var(--muted); font-size: 1.05rem; }
+.section__head-cta { margin-top: 18px; }
 
 .eyebrow {
   display: inline-block;
@@ -382,6 +383,90 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .book-card__meta { color: var(--muted); font-size: .88rem; margin: 6px 0 14px; }
 .book-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .price { font-weight: 900; font-size: 1.25rem; color: var(--pink); }
+
+/* ============================================================
+   PAGE HERO  (dedicated pages, e.g. books.html)
+   ============================================================ */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: clamp(36px, 6vw, 64px) 0 clamp(44px, 6vw, 72px);
+  background: linear-gradient(180deg, #fff 0%, var(--pink-wash) 100%);
+}
+.page-hero .container { position: relative; z-index: 2; }
+.page-hero h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); margin: 14px 0 12px; }
+.page-hero__lead { color: var(--muted); max-width: 46em; margin: 0 auto; font-size: 1.05rem; }
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.breadcrumb a { color: var(--pink); }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span[aria-current] { color: var(--ink); font-weight: 700; }
+
+/* ============================================================
+   CATALOG TOOLBAR  (filters + search + sort)
+   ============================================================ */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 20px;
+  margin-bottom: 22px;
+}
+.filters--toolbar { justify-content: flex-start; margin-bottom: 0; }
+.toolbar__right { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.search { position: relative; display: inline-flex; align-items: center; }
+.search__icon { position: absolute; left: 16px; font-size: .9rem; opacity: .5; pointer-events: none; }
+.search input {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: .92rem;
+  padding: 11px 18px 11px 42px;
+  min-width: 220px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 2px var(--line);
+  background: #fff;
+  color: var(--ink);
+  transition: box-shadow .15s ease;
+}
+.search input::placeholder { color: var(--muted); font-weight: 500; }
+.search input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--pink); }
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .9rem;
+  padding: 11px 42px 11px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 2px var(--line);
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F20965' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center;
+  color: var(--ink);
+  cursor: pointer;
+  transition: box-shadow .15s ease;
+}
+.select:hover, .select:focus { outline: none; box-shadow: inset 0 0 0 2px var(--pink); }
+
+.result-count { color: var(--muted); font-size: .92rem; margin: 0 0 20px; }
+.result-count strong { color: var(--ink); }
+
+.empty-state { text-align: center; padding: 70px 20px; }
+.empty-state__emoji { font-size: 3rem; margin-bottom: 14px; }
+.empty-state h3 { font-size: 1.3rem; margin-bottom: 8px; }
+.empty-state p { color: var(--muted); }
 
 /* ============================================================
    ANIMATIONS
@@ -720,6 +805,14 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   .section__sub { font-size: 1rem; }
   .filters { margin-bottom: 32px; gap: 8px; }
   .filter { padding: 9px 16px; font-size: .9rem; }
+
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .filters--toolbar { justify-content: center; }
+  .toolbar__right { justify-content: center; }
+  .search { flex: 1 1 auto; }
+  .search input { width: 100%; }
+  .select { flex: 1 1 auto; }
+
   .cta-card { border-radius: 30px; }
   .quote-card { padding: 30px 24px 24px; }
   .footer { text-align: center; }
@@ -745,6 +838,10 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   .quote-grid { gap: 16px; }
   .footer__grid { grid-template-columns: 1fr; gap: 26px; padding-bottom: 30px; }
   .to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+
+  .toolbar__right { flex-direction: column; align-items: stretch; width: 100%; }
+  .search input, .select { width: 100%; }
+  .breadcrumb { font-size: .8rem; }
 }
 
 /* ---- Small phone (≤400px) ---- */

@@ -56,24 +56,26 @@
     });
   }
 
-  /* ---------- active link on scroll ---------- */
-  var sections = ["books", "animations", "how", "contact"]
-    .map(function (id) { return document.getElementById(id); })
-    .filter(Boolean);
-  var links = Array.prototype.slice.call(document.querySelectorAll(".nav__link"));
+  /* ---------- active link on scroll (home page only — other pages keep their static is-active) ---------- */
+  if (document.getElementById("books")) {
+    var sections = ["books", "animations", "how", "contact"]
+      .map(function (id) { return document.getElementById(id); })
+      .filter(Boolean);
+    var links = Array.prototype.slice.call(document.querySelectorAll(".nav__link"));
 
-  function setActiveLink() {
-    var pos = window.scrollY + window.innerHeight * 0.35;
-    var current = "top";
-    sections.forEach(function (sec) {
-      if (sec.offsetTop <= pos) current = sec.id;
-    });
-    links.forEach(function (a) {
-      a.classList.toggle("is-active", a.getAttribute("href") === "#" + current);
-    });
+    var setActiveLink = function () {
+      var pos = window.scrollY + window.innerHeight * 0.35;
+      var current = "top";
+      sections.forEach(function (sec) {
+        if (sec.offsetTop <= pos) current = sec.id;
+      });
+      links.forEach(function (a) {
+        a.classList.toggle("is-active", a.getAttribute("href") === "#" + current);
+      });
+    };
+    setActiveLink();
+    window.addEventListener("scroll", setActiveLink, { passive: true });
   }
-  setActiveLink();
-  window.addEventListener("scroll", setActiveLink, { passive: true });
 
   /* ---------- reveal on scroll ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
@@ -94,20 +96,64 @@
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
 
-  /* ---------- book filter ---------- */
+  /* ---------- book filter + search + sort ---------- */
   var filters = document.querySelectorAll(".filter");
-  var cards = document.querySelectorAll("#bookGrid .book-card");
+  var bookGrid = document.getElementById("bookGrid");
+  var cards = bookGrid ? bookGrid.querySelectorAll(".book-card") : [];
+  var searchInput = document.getElementById("bookSearch");
+  var sortSelect = document.getElementById("bookSort");
+  var resultCount = document.getElementById("resultCount");
+  var emptyState = document.getElementById("emptyState");
+  var activeFilter = "all";
+  var originalOrder = Array.prototype.slice.call(cards);
+
+  function cardTitle(card) {
+    var h3 = card.querySelector("h3");
+    return (card.dataset.title || (h3 ? h3.textContent : "") || "").toLowerCase().trim();
+  }
+
+  function applyFilters() {
+    var query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    var visible = 0;
+    cards.forEach(function (card) {
+      var matchesCat = activeFilter === "all" || card.dataset.cat === activeFilter;
+      var matchesQuery = !query || cardTitle(card).indexOf(query) !== -1;
+      var show = matchesCat && matchesQuery;
+      card.classList.toggle("is-hidden", !show);
+      if (show) visible++;
+    });
+    if (resultCount) resultCount.innerHTML = "ნაპოვნია <strong>" + visible + "</strong> წიგნი";
+    if (emptyState) emptyState.hidden = visible !== 0;
+  }
+
   filters.forEach(function (btn) {
     btn.addEventListener("click", function () {
       filters.forEach(function (b) { b.classList.remove("is-active"); });
       btn.classList.add("is-active");
-      var f = btn.dataset.filter;
-      cards.forEach(function (card) {
-        var show = f === "all" || card.dataset.cat === f;
-        card.classList.toggle("is-hidden", !show);
-      });
+      activeFilter = btn.dataset.filter;
+      applyFilters();
     });
   });
+
+  if (searchInput) searchInput.addEventListener("input", applyFilters);
+
+  if (sortSelect && bookGrid) {
+    sortSelect.addEventListener("change", function () {
+      var mode = sortSelect.value;
+      var list = Array.prototype.slice.call(cards);
+      if (mode === "az" || mode === "za") {
+        list.sort(function (a, b) {
+          var cmp = cardTitle(a).localeCompare(cardTitle(b), "ka");
+          return mode === "az" ? cmp : -cmp;
+        });
+      } else {
+        list = originalOrder;
+      }
+      list.forEach(function (card) { bookGrid.appendChild(card); });
+    });
+  }
+
+  if (cards.length) applyFilters();
 
   /* ---------- FAQ accordion ---------- */
   var faqItems = document.querySelectorAll(".faq-item");
