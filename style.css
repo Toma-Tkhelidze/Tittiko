@@ -526,33 +526,40 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .cover--lg .cover__title { font-size: clamp(1.3rem, 3.4vw, 2rem); }
 .cover--lg .cover__brand { font-size: .78rem; }
 
-.product__price { font-weight: 900; font-size: 1.7rem; color: var(--pink); }
-.product__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 6px 0 16px; }
-.product__blurb { color: var(--muted); font-size: 1.06rem; margin-bottom: 24px; }
+.product__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 0 0 6px; }
+.product__price { font-weight: 900; font-size: 1.9rem; color: var(--pink); margin-bottom: 18px; }
+.product__blurb { color: var(--muted); font-size: 1.06rem; margin-bottom: 26px; }
 
-.product__meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
-.chip {
-  font-weight: 700;
-  font-size: .82rem;
-  padding: 8px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--pink-wash);
-  color: var(--ink);
+/* prominent feature list (age / print time / gift wrap) */
+.product__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 26px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
-
-.upload-box {
+.feat {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  margin-bottom: 24px;
-  border: 2px dashed var(--line);
-  border-radius: var(--radius-sm);
-  color: var(--muted);
-  font-size: .92rem;
-  font-weight: 600;
+  gap: 14px;
+  padding: 14px 18px;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--ink);
 }
-.upload-box__icon { font-size: 1.4rem; flex-shrink: 0; }
+.feat + .feat { border-top: 2px solid var(--line); }
+.feat__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--pink-wash);
+  font-size: 1.2rem;
+}
 
 .product__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
 .product__note { color: var(--muted); font-size: .85rem; }
@@ -566,8 +573,8 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   .product__media { position: static; }
   .cover--lg { max-width: 300px; }
   .product__info { text-align: center; }
-  .product__meta, .product__actions { justify-content: center; }
-  .upload-box { text-align: left; }
+  .product__actions { justify-content: center; }
+  .product__meta { text-align: left; max-width: 420px; margin-inline: auto; }
 }
 @media (max-width: 600px) {
   .product__actions .btn { width: 100%; }
