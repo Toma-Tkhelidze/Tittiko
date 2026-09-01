@@ -727,6 +727,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   :root { --maxw: 1360px; }
   .hero__title { font-size: clamp(4.6rem, 5vw, 5.4rem); }
   .section { padding: 130px 0; }
+  .book-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 /* ---- Small desktop / large laptop (≤1200px) ---- */
