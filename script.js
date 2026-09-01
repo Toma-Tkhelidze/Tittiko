@@ -40,6 +40,22 @@
     });
   }
 
+  /* ---------- logo → back to top (no reload when already home) ---------- */
+  var navLogo = document.getElementById("navLogo");
+  if (navLogo) {
+    navLogo.addEventListener("click", function (e) {
+      var path = window.location.pathname.split("/").pop();
+      if (path === "" || path === "index.html") {
+        e.preventDefault();
+        closeMenu();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+      }
+    });
+  }
+
   /* ---------- active link on scroll ---------- */
   var sections = ["books", "animations", "how", "contact"]
     .map(function (id) { return document.getElementById(id); })
