@@ -595,6 +595,13 @@
         }
 
         var data = new FormData(orderForm);
+        /* Web3Forms free plan does not accept file uploads — send the photo's
+           name as text and ask the customer to e-mail the actual file. */
+        data.delete("photo");
+        var pf = photo && photo.files && photo.files[0];
+        data.append("ფოტო", pf
+          ? "არჩეულია: " + pf.name + " — მომხმარებელს ვთხოვთ ელფოსტაზე გამოგზავნას"
+          : "არ ატვირთა");
         data.append("access_key", WEB3FORMS_KEY);
         data.append("subject", "ახალი შეკვეთა (" + oKind + "): " + oItem.title);
         data.append("from_name", "ტიტიკო — ვებსაიტი");
@@ -608,6 +615,8 @@
             if (res.success) {
               var wrap = document.getElementById("orderWrap");
               var done = document.getElementById("orderSuccess");
+              var photoNote = document.getElementById("orderSuccessPhoto");
+              if (photoNote && pf) photoNote.hidden = false;
               if (wrap) wrap.hidden = true;
               if (done) { done.hidden = false; done.scrollIntoView({ behavior: "smooth" }); }
             } else {
