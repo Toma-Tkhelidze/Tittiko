@@ -297,8 +297,8 @@
      ============================================================ */
   var orderForm = document.getElementById("orderForm");
   if (orderForm) {
-    /* --- 1. paste your Web3Forms access key here (free at https://web3forms.com) --- */
-    var WEB3FORMS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+    /* --- Web3Forms access key (manage at https://web3forms.com) --- */
+    var WEB3FORMS_KEY = "2f585767-f8ed-4be7-96fa-b67bc037ebc0";
 
     var oParams = new URLSearchParams(window.location.search);
     var oBook = BOOKS[oParams.get("id")];
