@@ -383,7 +383,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 /* related grids (book.html "სხვა წიგნები" / animation.html "სხვა ანიმაციები")
    — keep the normal card size, just centre the group */
 #relatedGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-#animRelatedGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 880px; margin-inline: auto; }
+#animRelatedGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1040px; margin-inline: auto; }
 @media (max-width: 900px) {
   #relatedGrid, #animRelatedGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; }
 }
