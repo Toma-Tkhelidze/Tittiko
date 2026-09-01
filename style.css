@@ -380,11 +380,12 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   gap: clamp(16px, 2.5vw, 28px);
 }
 
-/* related grids (book.html "სხვა წიგნები" / animation.html "სხვა ანიმაციები") — centered, fixed columns */
-#relatedGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 1000px; margin-inline: auto; }
-#animRelatedGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 760px; margin-inline: auto; }
+/* related grids (book.html "სხვა წიგნები" / animation.html "სხვა ანიმაციები")
+   — keep the normal card size, just centre the group */
+#relatedGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#animRelatedGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 880px; margin-inline: auto; }
 @media (max-width: 900px) {
-  #relatedGrid, #animRelatedGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 480px; }
+  #relatedGrid, #animRelatedGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; }
 }
 @media (max-width: 400px) {
   #relatedGrid, #animRelatedGrid { grid-template-columns: minmax(0, 1fr); }
