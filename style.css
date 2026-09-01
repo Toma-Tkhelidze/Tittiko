@@ -530,35 +530,35 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .product__price { font-weight: 900; font-size: 1.9rem; color: var(--pink); margin-bottom: 18px; }
 .product__blurb { color: var(--muted); font-size: 1.06rem; margin-bottom: 26px; }
 
-/* prominent feature list (age / print time / gift wrap) */
+/* compact feature list (age / print time / gift wrap) */
 .product__meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 26px;
-  border: 2px solid var(--line);
-  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  max-width: 330px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
   overflow: hidden;
 }
 .feat {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  font-weight: 800;
-  font-size: 1rem;
+  gap: 10px;
+  padding: 9px 13px;
+  font-weight: 700;
+  font-size: .86rem;
   color: var(--ink);
 }
-.feat + .feat { border-top: 2px solid var(--line); }
+.feat + .feat { border-top: 1.5px solid var(--line); }
 .feat__icon {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--pink-wash);
-  font-size: 1.2rem;
+  font-size: .9rem;
 }
 
 .product__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
@@ -574,7 +574,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   .cover--lg { max-width: 300px; }
   .product__info { text-align: center; }
   .product__actions { justify-content: center; }
-  .product__meta { text-align: left; max-width: 420px; margin-inline: auto; }
+  .product__meta { text-align: left; margin-inline: auto; }
 }
 @media (max-width: 600px) {
   .product__actions .btn { width: 100%; }
