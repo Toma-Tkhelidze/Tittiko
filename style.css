@@ -498,6 +498,81 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .empty-state h3 { font-size: 1.3rem; margin-bottom: 8px; }
 .empty-state p { color: var(--muted); }
 
+/* whole book card is clickable (JS-wired) */
+.book-card--link { cursor: pointer; }
+
+/* ============================================================
+   BOOK DETAIL PAGE  (book.html)
+   ============================================================ */
+.breadcrumb--left { justify-content: flex-start; margin-bottom: 28px; }
+
+.product {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+.product__media { position: sticky; top: calc(var(--nav-h) + 24px); }
+
+.cover--lg {
+  aspect-ratio: 3 / 4;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+}
+.cover--lg .cover__emoji { font-size: clamp(3rem, 9vw, 5rem); }
+.cover--lg .cover__title { font-size: clamp(1.3rem, 3.4vw, 2rem); }
+.cover--lg .cover__brand { font-size: .78rem; }
+
+.product__price { font-weight: 900; font-size: 1.7rem; color: var(--pink); }
+.product__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 6px 0 16px; }
+.product__blurb { color: var(--muted); font-size: 1.06rem; margin-bottom: 24px; }
+
+.product__meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+.chip {
+  font-weight: 700;
+  font-size: .82rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--pink-wash);
+  color: var(--ink);
+}
+
+.upload-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: .92rem;
+  font-weight: 600;
+}
+.upload-box__icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.product__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.product__note { color: var(--muted); font-size: .85rem; }
+
+.book-notfound { text-align: center; padding: 60px 20px 40px; }
+.book-notfound h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 12px 0 10px; }
+.book-notfound p { color: var(--muted); margin-bottom: 22px; }
+
+@media (max-width: 860px) {
+  .product { grid-template-columns: 1fr; }
+  .product__media { position: static; }
+  .cover--lg { max-width: 300px; }
+  .product__info { text-align: center; }
+  .product__meta, .product__actions { justify-content: center; }
+  .upload-box { text-align: left; }
+}
+@media (max-width: 600px) {
+  .product__actions .btn { width: 100%; }
+}
+
 /* ============================================================
    ANIMATIONS
    ============================================================ */
