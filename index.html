@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ტიტიკო — პერსონალიზებული წიგნები და ანიმაციები ბავშვებისთვის</title>
+  <meta name="description" content="ტიტიკო ქმნის პერსონალიზებულ წიგნებსა და ანიმაციებს, სადაც მთავარი გმირი შენი ბავშვია. ყველა ბავშვი გმირია!" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+  <noscript>
+    <style>[data-reveal] { opacity: 1 !important; transform: none !important; }</style>
+  </noscript>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a class="nav__logo" href="#top" aria-label="ტიტიკო — მთავარი">
+        <img src="image/titiko logo.webp" alt="ტიტიკო" />
+      </a>
+
+      <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
+        <a href="#top" class="nav__link is-active">მთავარი</a>
+        <a href="#books" class="nav__link">წიგნები</a>
+        <a href="#animations" class="nav__link">ანიმაციები</a>
+        <a href="#how" class="nav__link">როგორ მუშაობს</a>
+        <a href="#contact" class="nav__link">კონტაქტი</a>
+        <a href="#books" class="btn btn--primary btn--sm nav__cta">პერსონალიზაცია</a>
+      </nav>
+
+      <button class="nav__toggle" id="navToggle" aria-label="მენიუს გახსნა" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <span class="eyebrow">პერსონალიზებული წიგნები და ანიმაციები ბავშვებისთვის</span>
+          <h1 class="hero__title">ყველა ბავშვი <span class="tx-pink">გმირია</span></h1>
+          <p class="hero__lead">
+            ტიტიკო ქმნის ჯადოსნურ ისტორიებს, სადაც მთავარი გმირი შენი პატარაა —
+            მისი სახელით, გარეგნობითა და საყვარელი დეტალებით. საჩუქარი, რომელიც
+            არასდროს დაავიწყდება.
+          </p>
+          <div class="hero__actions">
+            <a href="#books" class="btn btn--primary">წიგნის პერსონალიზაცია</a>
+            <a href="#animations" class="btn btn--ghost">ანიმაციების ნახვა</a>
+          </div>
+          <ul class="hero__stats">
+            <li><strong>12 000+</strong><span>ბედნიერი ბავშვი</span></li>
+            <li><strong>4.9/5</strong><span>მშობლების შეფასება</span></li>
+            <li><strong>2–8</strong><span>ასაკობრივი ჯგუფი</span></li>
+          </ul>
+        </div>
+
+        <div class="hero__visual">
+          <div class="stage">
+            <div class="cover cover--c3 stage__book stage__book--back">
+              <span class="cover__emoji">🚀</span>
+              <span class="cover__title">კოსმოსური თავგადასავალი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="cover cover--c1 stage__book stage__book--front">
+              <span class="cover__emoji">🦸</span>
+              <span class="cover__title">პატარა სუპერგმირი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+
+            <span class="float-badge float-badge--tl">✨ შენი სახელით</span>
+            <span class="float-badge float-badge--br">🎬 + ანიმაცია</span>
+            <span class="float-badge float-badge--bl">📖 ასაკი 2–8</span>
+
+            <div class="sticker" aria-hidden="true">
+              <img src="image/titiko logo.webp" alt="" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRUST STRIP ============ -->
+    <section class="strip" aria-label="უპირატესობები">
+      <div class="strip__inner">
+        <div class="strip__item"><span>🚚</span> სწრაფი მიწოდება მთელ საქართველოში</div>
+        <div class="strip__item"><span>🔒</span> გადახდა დაცულია</div>
+        <div class="strip__item"><span>🎁</span> სასაჩუქრე შეფუთვა უფასოდ</div>
+        <div class="strip__item"><span>♻️</span> ხარისხიანი, უსაფრთხო მასალა</div>
+      </div>
+    </section>
+
+    <!-- ============ BOOKS ============ -->
+    <section class="section" id="books">
+      <div class="container">
+        <header class="section__head" data-reveal>
+          <span class="eyebrow">პოპულარული</span>
+          <h2 class="section__title">ყველა წიგნი</h2>
+          <p class="section__sub">აირჩიე ისტორია, შეიყვანე ბავშვის მონაცემები და მიიღე უნიკალური წიგნი 2–3 დღეში.</p>
+        </header>
+
+        <div class="filters" data-reveal role="tablist" aria-label="წიგნების ფილტრი">
+          <button class="filter is-active" data-filter="all">ყველა</button>
+          <button class="filter" data-filter="girls">გოგონებისთვის</button>
+          <button class="filter" data-filter="boys">ბიჭებისთვის</button>
+          <button class="filter" data-filter="learn">სასწავლო</button>
+        </div>
+
+        <div class="book-grid" id="bookGrid">
+          <article class="book-card" data-cat="boys" data-reveal>
+            <div class="cover cover--c1">
+              <span class="cover__emoji">🦸</span>
+              <span class="cover__title">პატარა სუპერგმირი</span>
+              <span class="cover__brand">ტიტიკო</span>
+              <span class="cover__tag">პოპულარული</span>
+            </div>
+            <div class="book-card__body">
+              <h3>პატარა სუპერგმირი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="learn" data-reveal>
+            <div class="cover cover--c2">
+              <span class="cover__emoji">🌍</span>
+              <span class="cover__title">მოგზაურობა დედამიწის გარშემო</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>მოგზაურობა დედამიწის გარშემო</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="boys" data-reveal>
+            <div class="cover cover--c3">
+              <span class="cover__emoji">🚀</span>
+              <span class="cover__title">კოსმოსური თავგადასავალი</span>
+              <span class="cover__brand">ტიტიკო</span>
+              <span class="cover__tag">პოპულარული</span>
+            </div>
+            <div class="book-card__body">
+              <h3>კოსმოსური თავგადასავალი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="learn" data-reveal>
+            <div class="cover cover--c4">
+              <span class="cover__emoji">🐾</span>
+              <span class="cover__title">ცხოველთა აკადემია</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>ცხოველთა აკადემია</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="boys" data-reveal>
+            <div class="cover cover--c5">
+              <span class="cover__emoji">🚗</span>
+              <span class="cover__title">მანქანების ქალაქი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>მანქანების ქალაქი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="learn" data-reveal>
+            <div class="cover cover--c6">
+              <span class="cover__emoji">🐠</span>
+              <span class="cover__title">წყალქვეშა თავგადასავალი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>წყალქვეშა თავგადასავალი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="boys" data-reveal>
+            <div class="cover cover--c7">
+              <span class="cover__emoji">🦕</span>
+              <span class="cover__title">დინოზავრების სამყარო</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>დინოზავრების სამყარო</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="girls" data-reveal>
+            <div class="cover cover--c8">
+              <span class="cover__emoji">👑</span>
+              <span class="cover__title">პრინცესას თავგადასავალი</span>
+              <span class="cover__brand">ტიტიკო</span>
+              <span class="cover__tag">პოპულარული</span>
+            </div>
+            <div class="book-card__body">
+              <h3>პრინცესას თავგადასავალი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="girls" data-reveal>
+            <div class="cover cover--c1">
+              <span class="cover__emoji">🧚</span>
+              <span class="cover__title">ფერიების ბაღი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>ფერიების ბაღი</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="learn" data-reveal>
+            <div class="cover cover--c2">
+              <span class="cover__emoji">🔤</span>
+              <span class="cover__title">ანბანის ჯადოქრობა</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>ანბანის ჯადოქრობა</h3>
+              <p class="book-card__meta">ასაკი 3–7 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="girls" data-reveal>
+            <div class="cover cover--c5">
+              <span class="cover__emoji">🌈</span>
+              <span class="cover__title">ცისარტყელას მოგონება</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>ცისარტყელას მოგონება</h3>
+              <p class="book-card__meta">ასაკი 2–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="book-card" data-cat="boys" data-reveal>
+            <div class="cover cover--c7">
+              <span class="cover__emoji">⚽</span>
+              <span class="cover__title">ფეხბურთის ვარსკვლავი</span>
+              <span class="cover__brand">ტიტიკო</span>
+            </div>
+            <div class="book-card__body">
+              <h3>ფეხბურთის ვარსკვლავი</h3>
+              <p class="book-card__meta">ასაკი 3–8 · მაგარი ყდა</p>
+              <div class="book-card__foot">
+                <span class="price">₾65</span>
+                <a href="#contact" class="btn btn--primary btn--sm">პერსონალიზება</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ANIMATIONS ============ -->
+    <section class="section section--wash" id="animations">
+      <div class="container">
+        <header class="section__head" data-reveal>
+          <span class="eyebrow">მსოფლიოსთვის საყვარელი</span>
+          <h2 class="section__title">ჯადოსნური ანიმაციები პატარა მეოცნებეებისთვის</h2>
+          <p class="section__sub">3–5 წუთიანი პერსონალიზებული მულტფილმი, სადაც შენი ბავშვი მთავარ როლს ასრულებს.</p>
+        </header>
+
+        <div class="anim-grid">
+          <article class="anim-card" data-reveal>
+            <div class="anim-thumb anim-thumb--a">
+              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <span class="anim-thumb__label">შენ ხარ გმირი</span>
+            </div>
+            <div class="anim-card__body">
+              <h3>შენ ხარ გმირი</h3>
+              <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
+              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+            </div>
+          </article>
+
+          <article class="anim-card" data-reveal>
+            <div class="anim-thumb anim-thumb--b">
+              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <span class="anim-thumb__label">ცისფერი პლანეტა</span>
+            </div>
+            <div class="anim-card__body">
+              <h3>ცისფერი პლანეტა</h3>
+              <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
+              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+            </div>
+          </article>
+
+          <article class="anim-card" data-reveal>
+            <div class="anim-thumb anim-thumb--c">
+              <button class="play" aria-label="ვიდეოს ჩვენება">▶</button>
+              <span class="anim-thumb__label">გაზაფხულის ზეიმი</span>
+            </div>
+            <div class="anim-card__body">
+              <h3>გაზაფხულის ზეიმი</h3>
+              <p class="book-card__meta">3–5 წთ · ასაკი 2–8</p>
+              <a href="#contact" class="btn btn--ghost btn--sm">პერსონალიზაცია</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section" id="how">
+      <div class="container">
+        <header class="section__head" data-reveal>
+          <span class="eyebrow">მარტივია</span>
+          <h2 class="section__title">როგორ მუშაობს</h2>
+        </header>
+
+        <ol class="steps">
+          <li class="step" data-reveal>
+            <span class="step__num">1</span>
+            <h3>აირჩიე ისტორია</h3>
+            <p>დაათვალიერე წიგნები და ანიმაციები და აირჩიე შენს ბავშვზე მორგებული თავგადასავალი.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step__num">2</span>
+            <h3>შეავსე მონაცემები</h3>
+            <p>შეიყვანე ბავშვის სახელი, ასაკი, კანისა და თმის ფერი და ატვირთე ფოტო.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step__num">3</span>
+            <h3>მიიღე საჩუქარი</h3>
+            <p>ჩვენ დავბეჭდავთ, შევფუთავთ და მოგიტანთ უნიკალურ წიგნს — ან გამოგიგზავნით ანიმაციას.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="section section--wash" id="reviews">
+      <div class="container">
+        <header class="section__head" data-reveal>
+          <span class="eyebrow">რას ამბობენ ჩვენზე</span>
+          <h2 class="section__title">სიყვარულით სავსე შეფასებები</h2>
+          <p class="section__sub">ბავშვების და მშობლების ემოციები საქართველოს ყველა კუთხიდან.</p>
+        </header>
+
+        <div class="quote-grid">
+          <figure class="quote-card" data-reveal>
+            <div class="quote-mark">“</div>
+            <blockquote>ჩემმა შვილმა საკუთარი თავი წიგნში რომ ნახა, თვალები აუციმციმდა. ეს საჩუქარი მართლა არასდროს დაავიწყდება.</blockquote>
+            <figcaption>
+              <span class="avatar" style="--a:var(--pink)">გ</span>
+              <span><strong>გიორგი</strong><br /><small>მამა</small></span>
+            </figcaption>
+          </figure>
+
+          <figure class="quote-card" data-reveal>
+            <div class="quote-mark">“</div>
+            <blockquote>საუკეთესო საჩუქარია ბავშვისთვის — უფრო დასამახსოვრებელია, როცა ბავშვი საკუთარ ისტორიას კითხულობს და თან სწავლობს.</blockquote>
+            <figcaption>
+              <span class="avatar" style="--a:var(--orange)">მ</span>
+              <span><strong>მარიამი</strong><br /><small>დედა</small></span>
+            </figcaption>
+          </figure>
+
+          <figure class="quote-card" data-reveal>
+            <div class="quote-mark">“</div>
+            <blockquote>ჩემი მოსწავლეები აღფრთოვანდნენ ტიტიკოს პერსონალიზებული ანიმაციებით. ეს პროექტი ბავშვებს კრეატიულობისკენ უბიძგებს.</blockquote>
+            <figcaption>
+              <span class="avatar" style="--a:var(--yellow); color:#1c1230">ს</span>
+              <span><strong>სოფო</strong><br /><small>მასწავლებელი</small></span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section" id="faq">
+      <div class="container container--narrow">
+        <header class="section__head" data-reveal>
+          <span class="eyebrow">დახმარება</span>
+          <h2 class="section__title">ხშირად დასმული კითხვები</h2>
+        </header>
+
+        <div class="faq" data-reveal>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">რამდენ ხანში მზადდება წიგნი?<span class="faq-ic">+</span></button>
+            <div class="faq-a"><p>სტანდარტული დამზადება 2–3 სამუშაო დღეა, მიწოდება — 1–2 დღე თბილისში და 2–4 დღე რეგიონებში.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">შემიძლია ფოტოს ატვირთვა?<span class="faq-ic">+</span></button>
+            <div class="faq-a"><p>დიახ. პერსონალიზაციისას ატვირთავ ბავშვის ფოტოს და ირჩევ თმისა და კანის ფერს — გმირი მასზე იქნება მორგებული.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">ანიმაცია და წიგნი ერთად შემიძლია შევუკვეთო?<span class="faq-ic">+</span></button>
+            <div class="faq-a"><p>დიახ, არსებობს კომბინირებული პაკეტი — წიგნი + ანიმაცია ერთი გმირით და ერთიანი ისტორიით.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">როგორ ხდება გადახდა?<span class="faq-ic">+</span></button>
+            <div class="faq-a"><p>გადახდა ხდება ბარათით, დაცული გადახდის სისტემით. თანხა ჩამოგეჭრება მხოლოდ შეკვეთის დადასტურების შემდეგ.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta-band" data-reveal>
+      <div class="container">
+        <div class="cta-card">
+          <div class="blob blob--c1"></div>
+          <div class="blob blob--c2"></div>
+          <h2>დაიწყე შენი პატარას ისტორია დღესვე</h2>
+          <p>რამდენიმე წუთში შექმნი საჩუქარს, რომელსაც ბავშვი წლების შემდეგაც გაიხსენებს.</p>
+          <a href="#books" class="btn btn--yellow">წიგნის პერსონალიზაცია</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <img src="image/titiko logo.webp" alt="ტიტიკო" />
+          <p>პერსონალიზებული წიგნები და ანიმაციები, სადაც მთავარი გმირი შენი ბავშვია.</p>
+        </div>
+
+        <nav aria-label="ნავიგაცია">
+          <h4>ნავიგაცია</h4>
+          <a href="#books">წიგნები</a>
+          <a href="#animations">ანიმაციები</a>
+          <a href="#how">როგორ მუშაობს</a>
+          <a href="#reviews">შეფასებები</a>
+        </nav>
+
+        <nav aria-label="ინფორმაცია">
+          <h4>ინფორმაცია</h4>
+          <a href="#faq">ხშირი კითხვები</a>
+          <a href="#">წესები და პირობები</a>
+          <a href="#">კონფიდენციალურობის პოლიტიკა</a>
+          <a href="#">მიწოდება და დაბრუნება</a>
+        </nav>
+
+        <div>
+          <h4>კონტაქტი</h4>
+          <a href="mailto:hello@tittiko.ge">hello@tittiko.ge</a>
+          <a href="tel:+995322000000">+995 32 2 000 000</a>
+          <div class="footer__social">
+            <a href="#" aria-label="Facebook">FB</a>
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="TikTok">TT</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bar">
+        <span>🔒 გადახდა დაცულია</span>
+        <span>ტიტიკო — © <span id="year">2026</span> ყველა უფლება დაცულია</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="ზემოთ დაბრუნება">↑</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
