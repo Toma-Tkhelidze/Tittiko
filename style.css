@@ -73,7 +73,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .section__head { text-align: center; max-width: 680px; margin: 0 auto clamp(36px, 5vw, 56px); }
 .section__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 10px 0 14px; }
 .section__sub { color: var(--muted); font-size: 1.05rem; }
-.section__head-cta { margin-top: 18px; }
+.section__more { text-align: center; margin-top: clamp(28px, 4vw, 44px); }
 
 .eyebrow {
   display: inline-block;
