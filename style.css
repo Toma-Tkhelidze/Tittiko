@@ -662,6 +662,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   font-size: .95rem;
   color: var(--muted);
 }
+.summary__row--extra { color: var(--pink); font-weight: 700; }
 .summary__total {
   margin-top: 6px;
   padding-top: 12px;
@@ -853,6 +854,16 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   opacity: 0;
   pointer-events: none;
 }
+.radio-card--stack { flex-direction: column; gap: 3px; padding: 15px 14px; }
+.radio-card__name { font-weight: 800; }
+.radio-card__price {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color .16s ease;
+}
+.radio-card:has(input:checked) .radio-card__price { color: rgba(255, 255, 255, .85); }
+
 .radio-card:hover { box-shadow: inset 0 0 0 2px var(--pink); }
 .radio-card:has(input:checked) {
   background-color: var(--pink);

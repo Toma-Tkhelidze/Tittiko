@@ -513,6 +513,32 @@
         }
       }
 
+      /* ---------- price: a hard cover adds a surcharge ---------- */
+      var HARD_COVER_EXTRA = 10;
+      var oCurrency = String(oItem.price).replace(/[\d.,\s]/g, "") || "₾";
+      var oBasePrice = parseFloat(String(oItem.price).replace(/[^\d.]/g, "")) || 0;
+      var summaryCoverRow = document.getElementById("summaryCoverRow");
+
+      function coverExtra() {
+        if (oIsAnim) return 0;
+        var picked = orderForm.querySelector('input[name="cover_type"]:checked');
+        return picked && picked.value === "hard" ? HARD_COVER_EXTRA : 0;
+      }
+
+      function money(n) { return oCurrency + n; }
+
+      function updateTotals() {
+        var extra = coverExtra();
+        if (summaryCoverRow) summaryCoverRow.hidden = extra === 0;
+        oSet("summaryCoverPrice", "+" + money(extra || HARD_COVER_EXTRA));
+        oSet("summaryTotal", money(oBasePrice + extra));
+        oVal("price", money(oBasePrice + extra));
+      }
+
+      Array.prototype.slice.call(orderForm.querySelectorAll('input[name="cover_type"]'))
+        .forEach(function (r) { r.addEventListener("change", updateTotals); });
+      updateTotals();
+
       /* live cover name preview */
       var childName = orderForm.elements.child_name;
       var previewName = document.getElementById("previewName");
@@ -575,8 +601,9 @@
           var groupRequired = false;
           group.forEach(function (r) { if (r.required) groupRequired = true; });
           if (!groupRequired) return "";
-          return orderForm.querySelector('input[name="' + el.name + '"]:checked')
-            ? "" : "აირჩიე ერთ-ერთი ვარიანტი";
+          if (orderForm.querySelector('input[name="' + el.name + '"]:checked')) return "";
+          var wrap = fieldWrap(el);
+          return (wrap && wrap.dataset.error) || "აირჩიე ერთ-ერთი ვარიანტი";
         }
 
         if (el.type === "file") {
@@ -827,10 +854,14 @@
           coverLabel = ct === "soft" ? "რბილი ყდა" : ct === "hard" ? "მაგარი ყდა" : "";
         }
 
+        var extra = coverExtra();
+
         var text =
           "🎁 <b>ახალი შეკვეთა — ტიტიკო</b>\n\n" +
           tgLine(oKind, oItem.title) +
-          tgLine("ფასი", oItem.price) +
+          tgLine("ფასი", money(oBasePrice)) +
+          (extra ? tgLine("მაგარი ყდა", "+" + money(extra)) : "") +
+          tgLine("ჯამი", money(oBasePrice + extra)) +
           "\n<b>👶 ბავშვი</b>\n" +
           tgLine("სახელი", val("child_name")) +
           tgLine("მოთხრობითში", val("child_name_story")) +

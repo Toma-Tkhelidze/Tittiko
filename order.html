@@ -75,6 +75,7 @@
 
             <div class="summary">
               <div class="summary__row"><span id="summaryBook">წიგნი</span><span id="summaryPrice">₾65</span></div>
+              <div class="summary__row summary__row--extra" id="summaryCoverRow" hidden><span>მაგარი ყდა</span><span id="summaryCoverPrice">+₾10</span></div>
               <div class="summary__row"><span>მიწოდება</span><span>უფასო</span></div>
               <div class="summary__row summary__total"><span>ჯამი</span><span id="summaryTotal">₾65</span></div>
             </div>
@@ -109,7 +110,7 @@
                   <input type="text" name="child_name" required minlength="2" placeholder="მაგ. ნიკა" autocomplete="off" />
                 </label>
                 <label class="field">
-                  <span class="field__label">სახელი მოთხრობითში <span class="req" aria-hidden="true">*</span></span>
+                  <span class="field__label">სახელი მიცემით ბრუნვაში <span class="req" aria-hidden="true">*</span></span>
                   <input type="text" name="child_name_story" required minlength="2" placeholder="მაგ. ნიკამ, ანამ" autocomplete="off" />
                 </label>
               </div>
@@ -191,12 +192,21 @@
             <div class="wizard__step" data-step="3">
               <h2 class="wizard__heading" id="stepBookHeading">წიგნის დეტალები</h2>
               <p class="wizard__sub" id="stepBookSub">მიძღვნა წიგნის პირველ გვერდზე დაიბეჭდება.</p>
-              <div class="field">
-                <span class="field__label">ყდის ტიპი <span class="req" aria-hidden="true">*</span></span>
+              <div class="field" id="coverField" data-error="აირჩიე ყდის ტიპი — რბილი ან მაგარი">
+                <span class="field__label">აირჩიე ყდის ტიპი <span class="req" aria-hidden="true">*</span></span>
                 <div class="radio-group">
-                  <label class="radio-card"><input type="radio" name="cover_type" value="hard" checked /><span>მაგარი ყდა</span></label>
-                  <label class="radio-card"><input type="radio" name="cover_type" value="soft" /><span>რბილი ყდა</span></label>
+                  <label class="radio-card radio-card--stack">
+                    <input type="radio" name="cover_type" value="soft" required />
+                    <span class="radio-card__name">რბილი ყდა</span>
+                    <span class="radio-card__price">ფასში შედის</span>
+                  </label>
+                  <label class="radio-card radio-card--stack">
+                    <input type="radio" name="cover_type" value="hard" />
+                    <span class="radio-card__name">მაგარი ყდა</span>
+                    <span class="radio-card__price">+₾10</span>
+                  </label>
                 </div>
+                <p class="field__hint">მაგარი ყდა უფრო გამძლეა და შეკვეთის ჯამს <strong>10 ₾-ით</strong> ზრდის.</p>
               </div>
               <label class="field">
                 <span class="field__label">მიძღვნის ტექსტი <span class="opt">არასავალდებულო</span></span>
