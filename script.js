@@ -473,6 +473,14 @@
         catLink.setAttribute("href", oIsAnim ? "animations.html" : "books.html");
       }
 
+      /* highlight the matching nav item */
+      if (oIsAnim) {
+        var navBooks = document.querySelector('.nav__menu a[href="books.html"]');
+        var navAnims = document.querySelector('.nav__menu a[href="animations.html"]');
+        if (navBooks) navBooks.classList.remove("is-active");
+        if (navAnims) navAnims.classList.add("is-active");
+      }
+
       if (oIsAnim) {
         /* animation = digital product: drop cover type + physical delivery */
         var ctField = orderForm.querySelector('[name="cover_type"]');
