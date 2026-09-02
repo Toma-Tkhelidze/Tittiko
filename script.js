@@ -418,7 +418,7 @@
 
        ჩასვი შენი Worker-ის მისამართი, ბოლო დახრილი ხაზის გარეშე:
        ------------------------------------------------------------------ */
-    var PROXY_URL = "PASTE_YOUR_WORKER_URL_HERE";
+    var PROXY_URL = "https://shy-sound-1c56.txelidze-toma.workers.dev";
 
     var TG_CAPTION_LIMIT = 1024;   /* sendPhoto caption limit  */
     var TG_MESSAGE_LIMIT = 4096;   /* sendMessage text limit   */
