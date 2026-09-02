@@ -412,17 +412,14 @@
   var orderForm = document.getElementById("orderForm");
   if (orderForm) {
     /* ------------------------------------------------------------------
-       TELEGRAM BOT — შეავსე ეს ორი მნიშვნელობა
-       BOT_TOKEN : @BotFather -ისგან მიღებული ტოკენი
-       CHAT_ID   : შენი ჩატის ID (@userinfobot ან @getmyid_bot გეტყვის)
+       შეკვეთა იგზავნება Cloudflare Worker-ის გავლით, რომელიც ინახავს
+       BOT_TOKEN-სა და CHAT_ID-ს სერვერზე — ისინი ბრაუზერში არ ჩანს.
+       Worker-ის კოდი: telegram-worker.js  (განთავსების ინსტრუქცია იქვეა)
 
-       ⚠️ ყურადღება: ეს ფაილი ბრაუზერში იტვირთება, ამიტომ ტოკენი
-       საჯაროდ ჩანს. გამოიყენე მხოლოდ ამ საიტისთვის გამოყოფილი ბოტი.
+       ჩასვი შენი Worker-ის მისამართი, ბოლო დახრილი ხაზის გარეშე:
        ------------------------------------------------------------------ */
-    var BOT_TOKEN = "PASTE_YOUR_BOT_TOKEN_HERE";
-    var CHAT_ID = "PASTE_YOUR_CHAT_ID_HERE";
+    var PROXY_URL = "PASTE_YOUR_WORKER_URL_HERE";
 
-    var TG_API = "https://api.telegram.org/bot" + BOT_TOKEN + "/";
     var TG_CAPTION_LIMIT = 1024;   /* sendPhoto caption limit  */
     var TG_MESSAGE_LIMIT = 4096;   /* sendMessage text limit   */
 
@@ -658,8 +655,9 @@
         return text.trim();
       }
 
+      /* the Worker injects chat_id + the bot token, then forwards to Telegram */
       function tgCall(method, body) {
-        return fetch(TG_API + method, { method: "POST", body: body })
+        return fetch(PROXY_URL.replace(/\/+$/, "") + "/" + method, { method: "POST", body: body })
           .then(function (r) { return r.json(); })
           .then(function (res) {
             if (!res.ok) throw new Error(res.description || "Telegram API error");
@@ -669,18 +667,14 @@
 
       function tgSendMessage(text) {
         var body = new FormData();
-        body.append("chat_id", CHAT_ID);
         body.append("text", text.slice(0, TG_MESSAGE_LIMIT));
-        body.append("parse_mode", "HTML");
         return tgCall("sendMessage", body);
       }
 
       function tgSendPhoto(file, caption) {
         var body = new FormData();
-        body.append("chat_id", CHAT_ID);
         body.append("photo", file);
         body.append("caption", caption);
-        body.append("parse_mode", "HTML");
         return tgCall("sendPhoto", body);
       }
 
@@ -693,10 +687,10 @@
         var submitBtn = document.getElementById("wizardSubmit");
         var submitLabel = "შეკვეთის გაგზავნა";
 
-        if (BOT_TOKEN === "PASTE_YOUR_BOT_TOKEN_HERE" || CHAT_ID === "PASTE_YOUR_CHAT_ID_HERE") {
+        if (!PROXY_URL || PROXY_URL === "PASTE_YOUR_WORKER_URL_HERE") {
           if (status) {
             status.className = "form-status form-status--warn";
-            status.textContent = "ფორმა მზადაა, თუმცა Telegram ჯერ არ არის დაკავშირებული — შეავსე BOT_TOKEN და CHAT_ID script.js-ში.";
+            status.textContent = "ფორმა მზადაა, თუმცა ჯერ არ არის დაკავშირებული — ჩასვი Worker-ის მისამართი script.js-ში (PROXY_URL).";
           }
           return;
         }
