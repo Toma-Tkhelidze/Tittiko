@@ -22,7 +22,8 @@
   --ok-wash: #e6f6ee;
   --white: #ffffff;
   --cream: #FFF6EF;
-  --pink-wash: #FFF0F6;
+  --pink-wash: #FFF0F6;                             /* tint for form surfaces */
+  --section-wash: #FFE6F0;                          /* full-width alternating sections */
   --lav: #F4F1FF;
 
   --radius: 28px;
@@ -76,8 +77,8 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 }
 .container--narrow { max-width: 780px; }
 
-.section { padding: clamp(64px, 9vw, 120px) 0; }
-.section--wash { background: var(--pink-wash); }
+.section { padding: clamp(64px, 6.5vw, 84px) 0; }
+.section--wash { background: var(--section-wash); }
 
 .section__head { text-align: center; max-width: 680px; margin: 0 auto clamp(36px, 5vw, 56px); }
 .section__title { font-size: clamp(1.9rem, 4.5vw, 3rem); margin: 10px 0 14px; }
@@ -1257,7 +1258,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 @media (min-width: 1600px) {
   :root { --maxw: 1360px; }
   .hero__title { font-size: clamp(4.6rem, 5vw, 5.4rem); }
-  .section { padding: 130px 0; }
+  .section { padding: 92px 0; }
   .book-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
