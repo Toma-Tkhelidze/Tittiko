@@ -97,22 +97,25 @@
               <li data-step="4"><span class="wizard__dot">4</span> მიწოდება</li>
             </ol>
 
+            <p class="form__legend"><span class="req" aria-hidden="true">*</span> ნიშნით მონიშნული ველები სავალდებულოა</p>
+
             <!-- STEP 1 — child -->
             <div class="wizard__step is-active" data-step="1">
               <h2 class="wizard__heading">ვის ვუქმნით ისტორიას?</h2>
+              <p class="wizard__sub">ეს მონაცემები ისტორიაში ბავშვის სახელით გამოჩნდება.</p>
               <div class="field-row">
                 <label class="field">
-                  <span class="field__label">ბავშვის სახელი *</span>
-                  <input type="text" name="child_name" required autocomplete="off" />
+                  <span class="field__label">ბავშვის სახელი <span class="req" aria-hidden="true">*</span></span>
+                  <input type="text" name="child_name" required minlength="2" placeholder="მაგ. ნიკა" autocomplete="off" />
                 </label>
                 <label class="field">
-                  <span class="field__label">სახელი მოთხრობით ბრუნვაში</span>
-                  <input type="text" name="child_name_story" placeholder="მაგ. ნიკამ, ანამ" autocomplete="off" />
+                  <span class="field__label">სახელი მოთხრობითში <span class="req" aria-hidden="true">*</span></span>
+                  <input type="text" name="child_name_story" required minlength="2" placeholder="მაგ. ნიკამ, ანამ" autocomplete="off" />
                 </label>
               </div>
               <div class="field-row">
                 <label class="field">
-                  <span class="field__label">ასაკი *</span>
+                  <span class="field__label">ასაკი <span class="req" aria-hidden="true">*</span></span>
                   <select class="select" name="child_age" required>
                     <option value="">აირჩიე</option>
                     <option>2</option><option>3</option><option>4</option>
@@ -120,7 +123,7 @@
                   </select>
                 </label>
                 <div class="field">
-                  <span class="field__label">სქესი *</span>
+                  <span class="field__label">სქესი <span class="req" aria-hidden="true">*</span></span>
                   <div class="radio-group">
                     <label class="radio-card"><input type="radio" name="child_gender" value="გოგო" required /><span>👧 გოგო</span></label>
                     <label class="radio-card"><input type="radio" name="child_gender" value="ბიჭი" /><span>👦 ბიჭი</span></label>
@@ -132,37 +135,54 @@
             <!-- STEP 2 — appearance -->
             <div class="wizard__step" data-step="2">
               <h2 class="wizard__heading">როგორ გამოიყურება გმირი?</h2>
+              <p class="wizard__sub">რაც უფრო ზუსტია აღწერა, მით უფრო ჰგავს გმირი ბავშვს.</p>
               <div class="field-row field-row--3">
                 <label class="field">
-                  <span class="field__label">თმის ფერი</span>
-                  <select class="select" name="hair_color">
-                    <option value="">—</option>
+                  <span class="field__label">თმის ფერი <span class="req" aria-hidden="true">*</span></span>
+                  <select class="select" name="hair_color" required>
+                    <option value="">აირჩიე</option>
                     <option>ქერა</option><option>წაბლისფერი</option><option>შავი</option>
                     <option>წითური</option><option>ღია ყავისფერი</option>
                   </select>
                 </label>
                 <label class="field">
-                  <span class="field__label">კანის ტონი</span>
-                  <select class="select" name="skin_tone">
-                    <option value="">—</option>
+                  <span class="field__label">კანის ტონი <span class="req" aria-hidden="true">*</span></span>
+                  <select class="select" name="skin_tone" required>
+                    <option value="">აირჩიე</option>
                     <option>ღია</option><option>საშუალო</option><option>მუქი</option>
                   </select>
                 </label>
                 <label class="field">
-                  <span class="field__label">თვალის ფერი</span>
-                  <select class="select" name="eye_color">
-                    <option value="">—</option>
+                  <span class="field__label">თვალის ფერი <span class="req" aria-hidden="true">*</span></span>
+                  <select class="select" name="eye_color" required>
+                    <option value="">აირჩიე</option>
                     <option>ყავისფერი</option><option>ცისფერი</option><option>მწვანე</option><option>რუხი</option>
                   </select>
                 </label>
               </div>
-              <div class="field">
-                <span class="field__label">ბავშვის ფოტო</span>
-                <label class="filebox">
-                  <input type="file" name="photo" accept="image/png,image/jpeg" />
-                  <span class="filebox__text">📷 აირჩიე ფოტო — JPG ან PNG, მაქს. 10 MB</span>
+              <div class="field" id="photoField">
+                <span class="field__label">ბავშვის ფოტო <span class="req" aria-hidden="true">*</span></span>
+
+                <label class="filebox" id="photoBox">
+                  <input type="file" name="photo" accept="image/png,image/jpeg" required />
+                  <span class="filebox__icon" aria-hidden="true">📷</span>
+                  <span class="filebox__text">აირჩიე ფოტო ან ჩააგდე აქ</span>
+                  <span class="filebox__meta">JPG ან PNG · მაქსიმუმ 10 MB</span>
                 </label>
-                <p class="field__hint" id="photoInfo"></p>
+
+                <div class="filecard" id="photoPreview" hidden>
+                  <img class="filecard__img" id="photoThumb" alt="ატვირთული ფოტოს გადახედვა" />
+                  <div class="filecard__body">
+                    <span class="filecard__ok">✓ ატვირთულია</span>
+                    <span class="filecard__name" id="photoName"></span>
+                    <span class="filecard__size" id="photoSize"></span>
+                  </div>
+                  <div class="filecard__actions">
+                    <button type="button" class="filecard__btn" id="photoChange">შეცვლა</button>
+                    <button type="button" class="filecard__btn filecard__btn--x" id="photoRemove" aria-label="ფოტოს წაშლა">✕</button>
+                  </div>
+                </div>
+
                 <p class="field__hint">პორტრეტული ფოტო, სახე სრულად ჩანდეს, თავზე ქუდის გარეშე. ხარისხი გავლენას ახდენს გმირთან მსგავსებაზე.</p>
               </div>
             </div>
@@ -170,15 +190,16 @@
             <!-- STEP 3 — book / extra -->
             <div class="wizard__step" data-step="3">
               <h2 class="wizard__heading" id="stepBookHeading">წიგნის დეტალები</h2>
+              <p class="wizard__sub" id="stepBookSub">მიძღვნა წიგნის პირველ გვერდზე დაიბეჭდება.</p>
               <div class="field">
-                <span class="field__label">ყდის ტიპი</span>
+                <span class="field__label">ყდის ტიპი <span class="req" aria-hidden="true">*</span></span>
                 <div class="radio-group">
                   <label class="radio-card"><input type="radio" name="cover_type" value="hard" checked /><span>მაგარი ყდა</span></label>
                   <label class="radio-card"><input type="radio" name="cover_type" value="soft" /><span>რბილი ყდა</span></label>
                 </div>
               </div>
               <label class="field">
-                <span class="field__label">მიძღვნის ტექსტი (არასავალდებულო)</span>
+                <span class="field__label">მიძღვნის ტექსტი <span class="opt">არასავალდებულო</span></span>
                 <textarea name="dedication" rows="3" placeholder="მაგ. საყვარელო ნიკა, გილოცავ დაბადების დღეს!"></textarea>
               </label>
             </div>
@@ -186,33 +207,34 @@
             <!-- STEP 4 — delivery -->
             <div class="wizard__step" data-step="4">
               <h2 class="wizard__heading" id="stepDeliveryHeading">მიწოდება და კონტაქტი</h2>
+              <p class="wizard__sub" id="stepDeliverySub">ამ ნომერზე დაგიკავშირდებით შეკვეთის დასაზუსტებლად.</p>
               <div class="field-row">
                 <label class="field">
-                  <span class="field__label">თქვენი სახელი და გვარი *</span>
-                  <input type="text" name="customer_name" required autocomplete="name" />
+                  <span class="field__label">თქვენი სახელი და გვარი <span class="req" aria-hidden="true">*</span></span>
+                  <input type="text" name="customer_name" required minlength="2" autocomplete="name" placeholder="მაგ. ნინო ბერიძე" />
                 </label>
                 <label class="field">
-                  <span class="field__label">ტელეფონი *</span>
-                  <input type="tel" name="phone" required autocomplete="tel" placeholder="+995 5xx xx xx xx" />
+                  <span class="field__label">ტელეფონი <span class="req" aria-hidden="true">*</span></span>
+                  <input type="tel" name="phone" required autocomplete="tel" inputmode="tel" placeholder="+995 599 12 34 56" />
                 </label>
               </div>
               <label class="field">
-                <span class="field__label">ელ-ფოსტა *</span>
-                <input type="email" name="email" required autocomplete="email" />
+                <span class="field__label">ელ-ფოსტა <span class="req" aria-hidden="true">*</span></span>
+                <input type="email" name="email" required autocomplete="email" inputmode="email" placeholder="name@mail.com" />
               </label>
               <div class="field-row" id="orderAddressRow">
                 <label class="field">
-                  <span class="field__label">ქალაქი *</span>
-                  <input type="text" name="city" required />
+                  <span class="field__label">ქალაქი <span class="req" aria-hidden="true">*</span></span>
+                  <input type="text" name="city" required minlength="2" autocomplete="address-level2" placeholder="მაგ. თბილისი" />
                 </label>
                 <label class="field">
-                  <span class="field__label">მისამართი *</span>
-                  <input type="text" name="address" required />
+                  <span class="field__label">მისამართი <span class="req" aria-hidden="true">*</span></span>
+                  <input type="text" name="address" required minlength="4" autocomplete="street-address" placeholder="ქუჩა, ნომერი, ბინა" />
                 </label>
               </div>
               <label class="field">
-                <span class="field__label">კომენტარი (არასავალდებულო)</span>
-                <textarea name="comment" rows="2"></textarea>
+                <span class="field__label">კომენტარი <span class="opt">არასავალდებულო</span></span>
+                <textarea name="comment" rows="2" placeholder="მიწოდების სასურველი დრო, დამატებითი სურვილი…"></textarea>
               </label>
             </div>
 

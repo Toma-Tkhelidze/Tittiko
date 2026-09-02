@@ -500,7 +500,9 @@
           addrRow.querySelectorAll("input").forEach(function (i) { i.required = false; });
         }
         oSet("stepBookHeading", "დამატებითი დეტალები");
+        oSet("stepBookSub", "მიძღვნის ტექსტი ანიმაციის დასაწყისში გამოჩნდება.");
         oSet("stepDeliveryHeading", "კონტაქტი");
+        oSet("stepDeliverySub", "მზა ანიმაციას ამ ელ-ფოსტაზე გამოგიგზავნით.");
         oSet("orderPrivacyNote", "🔒 ციფრულ ფაილს (MP4) გამოგიგზავნით მითითებულ ელფოსტაზე.");
       } else {
         /* cover type from URL (?coverType=hard|soft) */
@@ -523,24 +525,176 @@
         updatePreview();
       }
 
-      /* photo: validate + show file name */
+      /* ============================================================
+         VALIDATION — every field is required; errors are shown inline
+         under the field instead of the browser's native bubble.
+         ============================================================ */
+
+      /* ქართული ნომრები: მობილური 5XXXXXXXX · ქალაქის 3XXXXXXXX */
+      var GE_PHONE_RE = /^(?:5|3)\d{8}$/;
+      var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+
+      function fieldWrap(el) { return el.closest(".field") || el.parentElement; }
+
+      /* the error line is created on demand and kept above the grey hint */
+      function errorSlot(el) {
+        var wrap = fieldWrap(el);
+        if (!wrap) return null;
+        var slot = wrap.querySelector(".field__error");
+        if (!slot) {
+          slot = document.createElement("p");
+          slot.className = "field__error";
+          var hint = wrap.querySelector(".field__hint");
+          if (hint) wrap.insertBefore(slot, hint);
+          else wrap.appendChild(slot);
+        }
+        return slot;
+      }
+
+      function setFieldError(el, msg) {
+        var wrap = fieldWrap(el);
+        var slot = errorSlot(el);
+        if (wrap) wrap.classList.add("is-invalid");
+        if (slot) slot.textContent = msg;
+        el.setAttribute("aria-invalid", "true");
+        el.dataset.touched = "1";
+      }
+
+      function clearFieldError(el) {
+        var wrap = fieldWrap(el);
+        var slot = wrap && wrap.querySelector(".field__error");
+        if (wrap) wrap.classList.remove("is-invalid");
+        if (slot) slot.textContent = "";
+        el.removeAttribute("aria-invalid");
+      }
+
+      /* returns "" when the field is fine, otherwise the message to show */
+      function fieldError(el) {
+        if (el.type === "radio") {
+          var group = orderForm.querySelectorAll('input[name="' + el.name + '"]');
+          var groupRequired = false;
+          group.forEach(function (r) { if (r.required) groupRequired = true; });
+          if (!groupRequired) return "";
+          return orderForm.querySelector('input[name="' + el.name + '"]:checked')
+            ? "" : "აირჩიე ერთ-ერთი ვარიანტი";
+        }
+
+        if (el.type === "file") {
+          if (!el.required) return "";
+          return (el.files && el.files.length) ? "" : "ატვირთე ბავშვის ფოტო";
+        }
+
+        var v = (el.value || "").trim();
+
+        if (!v) {
+          if (!el.required) return "";
+          return el.tagName === "SELECT" ? "აირჩიე ვარიანტი სიიდან" : "ეს ველი სავალდებულოა";
+        }
+
+        if (el.type === "email") {
+          return EMAIL_RE.test(v) ? "" : "ელ-ფოსტა არასწორია — მაგ. name@mail.com";
+        }
+
+        if (el.type === "tel") {
+          var digits = v.replace(/\D/g, "").replace(/^0+/, "").replace(/^995/, "");
+          return GE_PHONE_RE.test(digits)
+            ? "" : "შეიყვანე ქართული ნომერი — მაგ. +995 599 12 34 56";
+        }
+
+        var min = parseInt(el.getAttribute("minlength"), 10);
+        if (min && v.length < min) return "მინიმუმ " + min + " სიმბოლო";
+
+        return "";
+      }
+
+      /* A field is "touched" once it has been checked at least once. Until then
+         we stay quiet; afterwards we clear the error as soon as it is fixed and
+         flag it again on blur if it breaks a second time. */
+      Array.prototype.slice.call(orderForm.querySelectorAll("input, select, textarea"))
+        .forEach(function (el) {
+          if (el.type === "hidden") return;
+
+          var clearWhenFixed = function () {
+            if (!el.dataset.touched) return;
+            if (!fieldError(el)) clearFieldError(el);
+          };
+
+          el.addEventListener("input", clearWhenFixed);
+          el.addEventListener("change", clearWhenFixed);
+          el.addEventListener("blur", function () {
+            if (!el.dataset.touched) return;
+            var msg = fieldError(el);
+            if (msg) setFieldError(el, msg); else clearFieldError(el);
+          });
+        });
+
+      /* ---------- photo: confirm the upload with a thumbnail card ---------- */
       var photo = orderForm.elements.photo;
-      var photoInfo = document.getElementById("photoInfo");
+      var photoBox = document.getElementById("photoBox");
+      var photoPreview = document.getElementById("photoPreview");
+      var photoThumb = document.getElementById("photoThumb");
+      var photoName = document.getElementById("photoName");
+      var photoSize = document.getElementById("photoSize");
+      var photoRemove = document.getElementById("photoRemove");
+      var photoChange = document.getElementById("photoChange");
+      var photoUrl = "";
+
+      function humanSize(bytes) {
+        return bytes < 1024 * 1024
+          ? Math.max(1, Math.round(bytes / 1024)) + " KB"
+          : (bytes / (1024 * 1024)).toFixed(1) + " MB";
+      }
+
+      function clearPhoto() {
+        if (photoUrl) { URL.revokeObjectURL(photoUrl); photoUrl = ""; }
+        if (photo) photo.value = "";
+        if (photoThumb) photoThumb.removeAttribute("src");
+        if (photoPreview) photoPreview.hidden = true;
+        if (photoBox) photoBox.hidden = false;
+      }
+
+      function showPhoto(f) {
+        if (photoUrl) URL.revokeObjectURL(photoUrl);
+        photoUrl = URL.createObjectURL(f);
+        if (photoThumb) photoThumb.src = photoUrl;
+        if (photoName) photoName.textContent = f.name;
+        if (photoSize) photoSize.textContent = humanSize(f.size);
+        if (photoBox) photoBox.hidden = true;
+        if (photoPreview) photoPreview.hidden = false;
+      }
+
       if (photo) {
         photo.addEventListener("change", function () {
           var f = photo.files && photo.files[0];
-          if (!f) { if (photoInfo) photoInfo.textContent = ""; return; }
-          var okType = /image\/(jpe?g|png)/i.test(f.type);
-          var okSize = f.size <= 10 * 1024 * 1024;
-          if (!okType) {
-            if (photoInfo) photoInfo.textContent = "მხოლოდ JPG ან PNG ფორმატი.";
-            photo.value = "";
-          } else if (!okSize) {
-            if (photoInfo) photoInfo.textContent = "ფაილი 10 MB-ზე დიდია.";
-            photo.value = "";
-          } else if (photoInfo) {
-            photoInfo.textContent = "✓ " + f.name;
+          if (!f) { clearPhoto(); return; }
+          if (!/image\/(jpe?g|png)/i.test(f.type)) {
+            clearPhoto();
+            setFieldError(photo, "მხოლოდ JPG ან PNG ფორმატი — სხვა ფაილი არ იტვირთება.");
+            return;
           }
+          if (f.size > 10 * 1024 * 1024) {
+            clearPhoto();
+            setFieldError(photo, "ფაილი 10 MB-ზე დიდია — აირჩიე პატარა ზომის ფოტო.");
+            return;
+          }
+          clearFieldError(photo);
+          showPhoto(f);
+        });
+      }
+
+      if (photoRemove) photoRemove.addEventListener("click", clearPhoto);
+      if (photoChange) photoChange.addEventListener("click", function () { if (photo) photo.click(); });
+
+      /* drag & drop straight onto the dropzone */
+      if (photoBox) {
+        ["dragenter", "dragover"].forEach(function (evt) {
+          photoBox.addEventListener(evt, function (e) {
+            e.preventDefault();
+            photoBox.classList.add("is-drag");
+          });
+        });
+        ["dragleave", "dragend", "drop"].forEach(function (evt) {
+          photoBox.addEventListener(evt, function () { photoBox.classList.remove("is-drag"); });
         });
       }
 
@@ -568,15 +722,58 @@
         orderForm.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
+      /* visible, enabled fields of one step — one entry per radio group */
+      function stepFields(i) {
+        var seen = {};
+        return Array.prototype.slice.call(steps[i].querySelectorAll("input, select, textarea"))
+          .filter(function (el) {
+            if (el.disabled || el.type === "hidden") return false;
+            if (el.closest("[hidden]")) return false;          /* skipped for animations */
+            if (el.type === "radio") {
+              if (seen[el.name]) return false;
+              seen[el.name] = true;
+            }
+            return true;
+          });
+      }
+
       function validateStep(i) {
-        var fields = steps[i].querySelectorAll("input, select, textarea");
-        for (var k = 0; k < fields.length; k++) {
-          if (!fields[k].checkValidity()) {
-            fields[k].reportValidity();
-            return false;
+        var firstBad = null;
+
+        stepFields(i).forEach(function (el) {
+          el.dataset.touched = "1";
+          var msg = fieldError(el);
+          if (msg) {
+            setFieldError(el, msg);
+            if (!firstBad) firstBad = el;
+          } else {
+            clearFieldError(el);
           }
+        });
+
+        var st = document.getElementById("orderStatus");
+
+        if (!firstBad) {
+          if (st) { st.textContent = ""; st.className = "form-status"; }
+          return true;
         }
-        return true;
+
+        if (st) {
+          st.className = "form-status form-status--err";
+          st.textContent = "შეავსე მონიშნული ველები სწორად, რომ გააგრძელო.";
+        }
+
+        var wrap = fieldWrap(firstBad);
+        if (wrap) {
+          wrap.classList.remove("shake");
+          void wrap.offsetWidth;                                /* restart the animation */
+          wrap.classList.add("shake");
+          wrap.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        if (firstBad.type !== "file") {
+          try { firstBad.focus({ preventScroll: true }); } catch (e) { firstBad.focus(); }
+        }
+        return false;
       }
 
       if (nextBtn) {
@@ -687,6 +884,15 @@
         var submitBtn = document.getElementById("wizardSubmit");
         var submitLabel = "შეკვეთის გაგზავნა";
 
+        /* re-check every step — a visitor can edit an earlier one and come back */
+        for (var si = 0; si < steps.length; si++) {
+          if (!validateStep(si)) {
+            if (si !== currentStep) showStep(si);
+            validateStep(si);
+            return;
+          }
+        }
+
         if (!PROXY_URL || PROXY_URL === "PASTE_YOUR_WORKER_URL_HERE") {
           if (status) {
             status.className = "form-status form-status--warn";
@@ -720,6 +926,7 @@
             var wrap = document.getElementById("orderWrap");
             var done = document.getElementById("orderSuccess");
             orderForm.reset();
+            clearPhoto();
             if (wrap) wrap.hidden = true;
             if (done) { done.hidden = false; done.scrollIntoView({ behavior: "smooth" }); }
           })
