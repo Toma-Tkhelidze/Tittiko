@@ -58,10 +58,6 @@
           <div class="empty-state__emoji">🎉</div>
           <h1>შეკვეთა მიღებულია!</h1>
           <p>გმადლობთ! ჩვენი გუნდი 24 საათში დაგიკავშირდებათ დეტალების დასაზუსტებლად.</p>
-          <p class="order-success__photo" id="orderSuccessPhoto" hidden>
-            📷 ბავშვის ფოტო გამოგვიგზავნეთ ელფოსტაზე
-            <a href="mailto:hello@tittiko.ge">hello@tittiko.ge</a> — თემაში მიუთითეთ ბავშვის სახელი.
-          </p>
           <a href="books.html" class="btn btn--primary">სხვა წიგნების ნახვა</a>
         </div>
 
@@ -85,10 +81,9 @@
           </aside>
 
           <!-- form -->
-          <form class="form" id="orderForm" action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" novalidate>
+          <form class="form" id="orderForm" novalidate>
             <h1 class="form__title">შეუკვეთე „<span id="orderBookTitle">წიგნი</span>“ <span class="form__price">— <span id="orderPrice">₾65</span></span></h1>
 
-            <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none !important" aria-hidden="true" />
             <input type="hidden" name="book" value="" />
             <input type="hidden" name="book_id" value="" />
             <input type="hidden" name="price" value="" />
@@ -169,7 +164,6 @@
                 </label>
                 <p class="field__hint" id="photoInfo"></p>
                 <p class="field__hint">პორტრეტული ფოტო, სახე სრულად ჩანდეს, თავზე ქუდის გარეშე. ხარისხი გავლენას ახდენს გმირთან მსგავსებაზე.</p>
-                <p class="field__hint">შენიშვნა: ფაილს ცალკე მოგთხოვთ ელფოსტაზე შეკვეთის მიღების შემდეგ.</p>
               </div>
             </div>
 

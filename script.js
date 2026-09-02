@@ -411,8 +411,20 @@
      ============================================================ */
   var orderForm = document.getElementById("orderForm");
   if (orderForm) {
-    /* --- Web3Forms access key (manage at https://web3forms.com) --- */
-    var WEB3FORMS_KEY = "2f585767-f8ed-4be7-96fa-b67bc037ebc0";
+    /* ------------------------------------------------------------------
+       TELEGRAM BOT — შეავსე ეს ორი მნიშვნელობა
+       BOT_TOKEN : @BotFather -ისგან მიღებული ტოკენი
+       CHAT_ID   : შენი ჩატის ID (@userinfobot ან @getmyid_bot გეტყვის)
+
+       ⚠️ ყურადღება: ეს ფაილი ბრაუზერში იტვირთება, ამიტომ ტოკენი
+       საჯაროდ ჩანს. გამოიყენე მხოლოდ ამ საიტისთვის გამოყოფილი ბოტი.
+       ------------------------------------------------------------------ */
+    var BOT_TOKEN = "PASTE_YOUR_BOT_TOKEN_HERE";
+    var CHAT_ID = "PASTE_YOUR_CHAT_ID_HERE";
+
+    var TG_API = "https://api.telegram.org/bot" + BOT_TOKEN + "/";
+    var TG_CAPTION_LIMIT = 1024;   /* sendPhoto caption limit  */
+    var TG_MESSAGE_LIMIT = 4096;   /* sendMessage text limit   */
 
     var oParams = new URLSearchParams(window.location.search);
     var oIsAnim = oParams.get("type") === "animation";
@@ -587,56 +599,144 @@
       });
       showStep(0);
 
-      /* submit */
+      /* ---------- Telegram helpers ---------- */
+
+      /* escape the five characters Telegram's HTML parse_mode cares about */
+      function tgEscape(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      /* "label: value" line, skipped entirely when the field is empty */
+      function tgLine(label, value) {
+        var v = (value == null ? "" : String(value)).trim();
+        return v ? "<b>" + label + ":</b> " + tgEscape(v) + "\n" : "";
+      }
+
+      function buildCaption() {
+        var f = orderForm.elements;
+        var val = function (name) {
+          var el = f[name];
+          if (!el) return "";
+          if (el.type === "radio" || (el.length && el[0] && el[0].type === "radio")) {
+            var picked = orderForm.querySelector('input[name="' + name + '"]:checked');
+            return picked ? picked.value : "";
+          }
+          return el.value || "";
+        };
+
+        var coverLabel = "";
+        if (!oIsAnim) {
+          var ct = val("cover_type");
+          coverLabel = ct === "soft" ? "რბილი ყდა" : ct === "hard" ? "მაგარი ყდა" : "";
+        }
+
+        var text =
+          "🎁 <b>ახალი შეკვეთა — ტიტიკო</b>\n\n" +
+          tgLine(oKind, oItem.title) +
+          tgLine("ფასი", oItem.price) +
+          "\n<b>👶 ბავშვი</b>\n" +
+          tgLine("სახელი", val("child_name")) +
+          tgLine("მოთხრობითში", val("child_name_story")) +
+          tgLine("ასაკი", val("child_age")) +
+          tgLine("სქესი", val("child_gender")) +
+          tgLine("თმის ფერი", val("hair_color")) +
+          tgLine("კანის ტონი", val("skin_tone")) +
+          tgLine("თვალის ფერი", val("eye_color")) +
+          tgLine("ყდის ტიპი", coverLabel) +
+          tgLine("მიძღვნა", val("dedication")) +
+          "\n<b>📞 შემკვეთი</b>\n" +
+          tgLine("სახელი", val("customer_name")) +
+          tgLine("ტელეფონი", val("phone")) +
+          tgLine("ელ-ფოსტა", val("email")) +
+          tgLine("ქალაქი", val("city")) +
+          tgLine("მისამართი", val("address")) +
+          tgLine("კომენტარი", val("comment"));
+
+        return text.trim();
+      }
+
+      function tgCall(method, body) {
+        return fetch(TG_API + method, { method: "POST", body: body })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (!res.ok) throw new Error(res.description || "Telegram API error");
+            return res;
+          });
+      }
+
+      function tgSendMessage(text) {
+        var body = new FormData();
+        body.append("chat_id", CHAT_ID);
+        body.append("text", text.slice(0, TG_MESSAGE_LIMIT));
+        body.append("parse_mode", "HTML");
+        return tgCall("sendMessage", body);
+      }
+
+      function tgSendPhoto(file, caption) {
+        var body = new FormData();
+        body.append("chat_id", CHAT_ID);
+        body.append("photo", file);
+        body.append("caption", caption);
+        body.append("parse_mode", "HTML");
+        return tgCall("sendPhoto", body);
+      }
+
+      /* ---------- submit ---------- */
       orderForm.addEventListener("submit", function (e) {
         e.preventDefault();
         if (currentStep !== steps.length - 1) return;
+
         var status = document.getElementById("orderStatus");
         var submitBtn = document.getElementById("wizardSubmit");
+        var submitLabel = "შეკვეთის გაგზავნა";
 
-        if (!WEB3FORMS_KEY || WEB3FORMS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY") {
+        if (BOT_TOKEN === "PASTE_YOUR_BOT_TOKEN_HERE" || CHAT_ID === "PASTE_YOUR_CHAT_ID_HERE") {
           if (status) {
             status.className = "form-status form-status--warn";
-            status.textContent = "ფორმა მზადაა, თუმცა ჯერ არ არის დაკავშირებული. დაამატე Web3Forms-ის access key script.js-ში (WEB3FORMS_KEY).";
+            status.textContent = "ფორმა მზადაა, თუმცა Telegram ჯერ არ არის დაკავშირებული — შეავსე BOT_TOKEN და CHAT_ID script.js-ში.";
           }
           return;
         }
 
-        var data = new FormData(orderForm);
-        /* Web3Forms free plan does not accept file uploads — send the photo's
-           name as text and ask the customer to e-mail the actual file. */
-        data.delete("photo");
-        var pf = photo && photo.files && photo.files[0];
-        data.append("ფოტო", pf
-          ? "არჩეულია: " + pf.name + " — მომხმარებელს ვთხოვთ ელფოსტაზე გამოგზავნას"
-          : "არ ატვირთა");
-        data.append("access_key", WEB3FORMS_KEY);
-        data.append("subject", "ახალი შეკვეთა (" + oKind + "): " + oItem.title);
-        data.append("from_name", "ტიტიკო — ვებსაიტი");
+        var caption = buildCaption();
+        var photoFile = photo && photo.files && photo.files[0];
 
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "იგზავნება…"; }
         if (status) { status.className = "form-status"; status.textContent = ""; }
 
-        fetch("https://api.web3forms.com/submit", { method: "POST", body: data })
-          .then(function (r) { return r.json(); })
-          .then(function (res) {
-            if (res.success) {
-              var wrap = document.getElementById("orderWrap");
-              var done = document.getElementById("orderSuccess");
-              var photoNote = document.getElementById("orderSuccessPhoto");
-              if (photoNote && pf) photoNote.hidden = false;
-              if (wrap) wrap.hidden = true;
-              if (done) { done.hidden = false; done.scrollIntoView({ behavior: "smooth" }); }
-            } else {
-              throw new Error(res.message || "შეცდომა");
-            }
+        var request;
+        if (photoFile) {
+          /* caption is capped at 1024 chars — if it overflows, send the photo
+             with a short header and the full details as a follow-up message */
+          if (caption.length <= TG_CAPTION_LIMIT) {
+            request = tgSendPhoto(photoFile, caption);
+          } else {
+            request = tgSendPhoto(photoFile, "🎁 <b>ახალი შეკვეთა — " + tgEscape(oItem.title) + "</b>")
+              .then(function () { return tgSendMessage(caption); });
+          }
+        } else {
+          request = tgSendMessage(caption);
+        }
+
+        request
+          .then(function () {
+            var wrap = document.getElementById("orderWrap");
+            var done = document.getElementById("orderSuccess");
+            orderForm.reset();
+            if (wrap) wrap.hidden = true;
+            if (done) { done.hidden = false; done.scrollIntoView({ behavior: "smooth" }); }
           })
           .catch(function (err) {
             if (status) {
               status.className = "form-status form-status--err";
               status.textContent = "გაგზავნა ვერ მოხერხდა: " + err.message + ". სცადე თავიდან ან დაგვირეკე.";
             }
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "შეკვეთის გაგზავნა"; }
+          })
+          .then(function () {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
           });
       });
     }
