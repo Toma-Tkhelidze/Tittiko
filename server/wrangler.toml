@@ -32,3 +32,35 @@ SITE_URL = "https://toma-tkhelidze.github.io/Tittiko"
 [[kv_namespaces]]
 binding = "ORDERS"
 id = "f80785673ac049448458ab53a2a2c038"
+
+# შეკვეთის ნომრის ატომური მრიცხველი. KV-ს "+1" ატომურად არ შეუძლია,
+# Durable Object-ს კი შეუძლია — ორი ერთდროული შეკვეთა ერთ ნომერს ვეღარ იღებს.
+[[durable_objects.bindings]]
+name = "ORDER_COUNTER"
+class_name = "OrderCounter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["OrderCounter"]
+
+# --- ლიმიტები ერთ IP-ზე ---
+# PAY_LIMIT იცავს ძვირ გზას: ყოველი შეკვეთა KV-ის ჩაწერებია და Telegram-ის
+# შეტყობინება. 10 შეკვეთა წუთში ერთი ადამიანისთვის მიუწვდომელია (ფორმა
+# ოთხსაფეხურიანია და ფოტოს ითხოვს), სკრიპტს კი აჩერებს.
+[[ratelimits]]
+name = "PAY_LIMIT"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+# READ_LIMIT — იაფი გზები (/order, /health). success.html ერთ ჩატვირთვაზე
+# მაქსიმუმ 5-ს ითხოვს, ამიტომ 60 წუთში ნორმალურ მოხმარებას ვერ შეეხება.
+[[ratelimits]]
+name = "READ_LIMIT"
+namespace_id = "1002"
+
+  [ratelimits.simple]
+  limit = 60
+  period = 60

@@ -108,6 +108,34 @@ const KEEP_ORDER_DAYS = 90;
 const KEEP_PHOTO_DAYS = 7;                  /* ფოტო Telegram-ში გაგზავნისთანავე აღარ სჭირდება */
 
 /* ============================================================================
+   შეკვეთის ნომრის მრიცხველი (Durable Object)
+   ----------------------------------------------------------------------------
+   KV-ს ატომური "+1" არ აქვს: ორი ერთდროული შეკვეთა ერთსა და იმავე ნომერს
+   იღებდა და მეორე ჩანაწერი პირველს გადააწერდა. Durable Object ერთადერთი
+   ობიექტია მთელ მსოფლიოში ამ სახელით და მოთხოვნებს რიგრიგობით ამუშავებს,
+   ამიტომ აქ შეჯახება შეუძლებელია.
+   ============================================================================ */
+export class OrderCounter {
+  constructor(state) {
+    this.state = state;
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+
+    /* პირველ გაშვებაზე მრიცხველი უკვე გაცემულ ნომრებს უნდა აცდეს — min-ს
+       KV-ის ძველი მრიცხველიდან ვიღებთ, რომ TTK-0001 ხელახლა არ გაიცეს */
+    let n = await this.state.storage.get("n");
+    if (n == null) n = Number(url.searchParams.get("min") || 0) || 0;
+
+    n = n + 1;
+    await this.state.storage.put("n", n);
+
+    return new Response(String(n));
+  }
+}
+
+/* ============================================================================
    მარშრუტიზაცია
    ============================================================================ */
 export default {
@@ -132,9 +160,31 @@ export default {
       return json({ ok: false, error: "Origin not allowed" }, 403, allowed);
     }
 
-    if (path === "/pay" && request.method === "POST") return handlePay(request, env, ctx);
-    if (path === "/order" && request.method === "GET") return handleOrderStatus(url, env, allowed);
-    if (path === "/health" && request.method === "GET") return handleHealth(env, allowed);
+    /* ერთი IP ვერ დაგვაშენებს ცრუ შეკვეთებს და ვერ ამოწურავს დღიურ ლიმიტს.
+       ბრაუზერის Origin-ის შემოწმება ამას ვერ აკეთებს — curl ნებისმიერ
+       Origin-ს დაწერს. */
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+
+    if (path === "/pay" && request.method === "POST") {
+      if (!(await underLimit(env.PAY_LIMIT, ip))) {
+        return json({ ok: false, error: "ძალიან ბევრი მცდელობა — დაელოდე წუთს და სცადე თავიდან" }, 429, allowed);
+      }
+      return handlePay(request, env, ctx);
+    }
+
+    if (path === "/order" && request.method === "GET") {
+      if (!(await underLimit(env.READ_LIMIT, ip))) {
+        return json({ ok: false, error: "ძალიან ბევრი მოთხოვნა" }, 429, allowed);
+      }
+      return handleOrderStatus(url, env, allowed);
+    }
+
+    if (path === "/health" && request.method === "GET") {
+      if (!(await underLimit(env.READ_LIMIT, ip))) {
+        return json({ ok: false, error: "ძალიან ბევრი მოთხოვნა" }, 429, allowed);
+      }
+      return handleHealth(env, allowed);
+    }
 
     return json({ ok: false, error: "Not found" }, 404, allowed);
   },
@@ -673,23 +723,44 @@ async function getOrder(env, orderNo) {
    KV-ს ატომური მთვლელი არ აქვს, ამიტომ დაკავებულ ნომერს ვამოწმებთ და ვცდილობთ
    შემდეგს. ამ მოცულობაზე (დღეში რამდენიმე შეკვეთა) სავსებით საკმარისია. */
 async function nextOrderNo(env) {
-  for (let i = 0; i < 10; i++) {
-    const current = parseInt((await env.ORDERS.get("counter")) || "0", 10) || 0;
-    const n = current + 1 + i;
-    const no = "TTK-" + String(n).padStart(4, "0");
+  /* ნომერს Durable Object გასცემს — ერთადერთი ატომური მრიცხველი */
+  if (env.ORDER_COUNTER) {
+    try {
+      const seed = parseInt((await env.ORDERS.get("counter")) || "0", 10) || 0;
+      const stub = env.ORDER_COUNTER.get(env.ORDER_COUNTER.idFromName("tittiko"));
+      const res = await stub.fetch("https://counter/next?min=" + seed);
+      const n = parseInt(await res.text(), 10);
 
-    if (await env.ORDERS.get("order:" + no)) continue;   /* დაკავებულია */
+      if (Number.isFinite(n) && n > 0) {
+        const no = "TTK-" + String(n).padStart(4, "0");
 
-    await env.ORDERS.put("counter", String(n));
-    return no;
+        /* KV-ის მრიცხველს სარკედ ვინახავთ: თუ ოდესმე DO ცარიელი დარჩა,
+           თავიდან დათვლა უკვე გაცემულ ნომრებს აცდება */
+        await env.ORDERS.put("counter", String(n));
+        return no;
+      }
+    } catch { /* ქვემოთ დროზე დაფუძნებულ ნომერზე გადავდივართ */ }
   }
-  /* თუ ვერაფერს მივაგენით — დროზე დაფუძნებული ნომერი, ყოველთვის უნიკალური */
-  return "TTK-" + Date.now();
+
+  /* მრიცხველამდე ვერ მივედით. თანმიმდევრული ნომრის გამოცნობა აქ საშიშია —
+     შეჯახება შეკვეთას წაშლიდა — ამიტომ ვირჩევთ აშკარად უნიკალურს. */
+  return "TTK-" + Date.now().toString(36).toUpperCase();
 }
 
 /* ============================================================================
    დამხმარეები
    ============================================================================ */
+/* ლიმიტი რომ არ იყოს მიბმული, მოთხოვნა არ უნდა ჩავარდეს — გამტარია */
+async function underLimit(limiter, key) {
+  if (!limiter) return true;
+  try {
+    const { success } = await limiter.limit({ key: key });
+    return success !== false;
+  } catch {
+    return true;
+  }
+}
+
 function str(v) { return typeof v === "string" ? v.trim() : ""; }
 
 function esc(v) {
