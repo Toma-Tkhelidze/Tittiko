@@ -856,6 +856,108 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   pointer-events: none;
 }
 .radio-card--stack { flex-direction: column; gap: 3px; padding: 15px 14px; }
+
+/* ---------- eye colour: a dropdown that shows the actual iris ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.picker { position: relative; }
+
+.picker__btn {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 42px 11px 15px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px var(--line);
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F20965' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center;
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: start;
+  min-height: 50px;
+  transition: box-shadow .16s ease, background-color .16s ease;
+}
+.picker__btn:hover { box-shadow: inset 0 0 0 2px var(--line-hover); }
+.picker__btn:focus-visible,
+.picker.is-open .picker__btn {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--pink), 0 0 0 4px rgba(242, 9, 101, .13);
+}
+.picker__value { flex: 1 1 auto; }
+.picker__btn .eye { width: 26px; height: 26px; }
+
+.field.is-invalid .picker__btn {
+  box-shadow: inset 0 0 0 2px var(--err);
+  background-color: var(--err-wash);
+}
+
+.picker__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  padding: 6px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 0 var(--line), var(--shadow-md);
+  animation: wizFade .16s ease;
+}
+.picker__opt {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  font-weight: 600;
+  font-size: .93rem;
+  cursor: pointer;
+  transition: background .14s ease, color .14s ease;
+}
+.picker__opt .eye { width: 26px; height: 26px; }
+.picker__opt:hover,
+.picker__opt:focus-visible { outline: none; background: var(--pink-wash); }
+.picker__opt[aria-selected="true"] { background: var(--pink); color: #fff; }
+
+.eye {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background:
+    radial-gradient(circle at 50% 50%, #12100f 0 27%, rgba(0, 0, 0, 0) 28%),
+    radial-gradient(circle at 50% 50%, var(--iris-hi) 27%, var(--iris) 60%, var(--iris-dark) 100%);
+  box-shadow: inset 0 0 0 2px rgba(18, 10, 26, .32), 0 2px 6px rgba(28, 18, 48, .2);
+}
+/* the catch-light that makes it read as an eye */
+.eye::after {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 26%;
+  width: 26%;
+  height: 26%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .78);
+}
+.eye--brown { --iris-hi: #A9743C; --iris: #7A4A21; --iris-dark: #3A210D; }
+.eye--blue  { --iris-hi: #8FC7E8; --iris: #4A93C6; --iris-dark: #1E4E73; }
+.eye--green { --iris-hi: #9BC47F; --iris: #5E8F4F; --iris-dark: #2E4F27; }
+.eye--grey  { --iris-hi: #C6CCD1; --iris: #8B949C; --iris-dark: #4A5158; }
 .radio-card__name { font-weight: 800; }
 .radio-card__price {
   font-size: .8rem;

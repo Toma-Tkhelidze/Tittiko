@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
   <noscript>
     <style>[data-reveal] { opacity: 1 !important; transform: none !important; }</style>
   </noscript>
@@ -137,7 +137,7 @@
             <div class="wizard__step" data-step="2">
               <h2 class="wizard__heading">როგორ გამოიყურება გმირი?</h2>
               <p class="wizard__sub">რაც უფრო ზუსტია აღწერა, მით უფრო ჰგავს გმირი ბავშვს.</p>
-              <div class="field-row field-row--3">
+              <div class="field-row">
                 <label class="field">
                   <span class="field__label">თმის ფერი <span class="req" aria-hidden="true">*</span></span>
                   <select class="select" name="hair_color" required>
@@ -153,13 +153,41 @@
                     <option>ღია</option><option>საშუალო</option><option>მუქი</option>
                   </select>
                 </label>
-                <label class="field">
-                  <span class="field__label">თვალის ფერი <span class="req" aria-hidden="true">*</span></span>
-                  <select class="select" name="eye_color" required>
-                    <option value="">აირჩიე</option>
-                    <option>ყავისფერი</option><option>ცისფერი</option><option>მწვანე</option><option>რუხი</option>
-                  </select>
-                </label>
+              </div>
+
+              <div class="field" id="eyeField" data-error="აირჩიე თვალის ფერი">
+                <span class="field__label" id="eyeLabel">თვალის ფერი <span class="req" aria-hidden="true">*</span></span>
+
+                <!-- the real control: kept for validation and submission, drawn by the picker below -->
+                <select class="sr-only" name="eye_color" required tabindex="-1" aria-hidden="true" data-focus-target="eyeTrigger">
+                  <option value="">აირჩიე</option>
+                  <option value="ყავისფერი">ყავისფერი</option>
+                  <option value="ცისფერი">ცისფერი</option>
+                  <option value="მწვანე">მწვანე</option>
+                  <option value="რუხი">რუხი</option>
+                </select>
+
+                <div class="picker" id="eyePicker">
+                  <button type="button" class="picker__btn" id="eyeTrigger"
+                          aria-haspopup="listbox" aria-expanded="false" aria-labelledby="eyeLabel eyeTrigger">
+                    <span class="eye" id="eyeCurrentSwatch" aria-hidden="true" hidden></span>
+                    <span class="picker__value" id="eyeValue">აირჩიე</span>
+                  </button>
+                  <ul class="picker__list" id="eyeList" role="listbox" aria-labelledby="eyeLabel" hidden>
+                    <li class="picker__opt" role="option" aria-selected="false" tabindex="-1" data-value="ყავისფერი" data-tone="eye--brown">
+                      <span class="eye eye--brown" aria-hidden="true"></span>ყავისფერი
+                    </li>
+                    <li class="picker__opt" role="option" aria-selected="false" tabindex="-1" data-value="ცისფერი" data-tone="eye--blue">
+                      <span class="eye eye--blue" aria-hidden="true"></span>ცისფერი
+                    </li>
+                    <li class="picker__opt" role="option" aria-selected="false" tabindex="-1" data-value="მწვანე" data-tone="eye--green">
+                      <span class="eye eye--green" aria-hidden="true"></span>მწვანე
+                    </li>
+                    <li class="picker__opt" role="option" aria-selected="false" tabindex="-1" data-value="რუხი" data-tone="eye--grey">
+                      <span class="eye eye--grey" aria-hidden="true"></span>რუხი
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div class="field" id="photoField">
                 <span class="field__label">ბავშვის ფოტო <span class="req" aria-hidden="true">*</span></span>
@@ -304,6 +332,6 @@
 
   <button class="to-top" id="toTop" aria-label="ზემოთ დაბრუნება">↑</button>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

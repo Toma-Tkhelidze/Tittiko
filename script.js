@@ -615,6 +615,8 @@
 
         if (!v) {
           if (!el.required) return "";
+          var emptyWrap = fieldWrap(el);
+          if (emptyWrap && emptyWrap.dataset.error) return emptyWrap.dataset.error;
           return el.tagName === "SELECT" ? "აირჩიე ვარიანტი სიიდან" : "ეს ველი სავალდებულოა";
         }
 
@@ -654,6 +656,91 @@
             if (msg) setFieldError(el, msg); else clearFieldError(el);
           });
         });
+
+      /* ---------- eye colour: a dropdown that shows the actual iris ----------
+         The <select> stays in the DOM (screen-reader hidden, not focusable) so
+         validation and submission keep working; this only draws it. */
+      var eyePicker = document.getElementById("eyePicker");
+      var eyeTrigger = document.getElementById("eyeTrigger");
+      var eyeList = document.getElementById("eyeList");
+      var eyeSelect = orderForm.elements.eye_color;
+
+      if (eyePicker && eyeTrigger && eyeList && eyeSelect) {
+        var eyeValue = document.getElementById("eyeValue");
+        var eyeSwatch = document.getElementById("eyeCurrentSwatch");
+        var eyeOpts = Array.prototype.slice.call(eyeList.querySelectorAll(".picker__opt"));
+
+        function eyeSetOpen(open) {
+          eyeList.hidden = !open;
+          eyePicker.classList.toggle("is-open", open);
+          eyeTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        function eyeIsOpen() { return !eyeList.hidden; }
+
+        function eyePick(value) {
+          eyeSelect.value = value;
+          eyeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+
+          var chosen = null;
+          eyeOpts.forEach(function (o) {
+            var on = o.dataset.value === value;
+            o.setAttribute("aria-selected", on ? "true" : "false");
+            if (on) chosen = o;
+          });
+
+          eyeValue.textContent = value || "აირჩიე";
+          if (eyeSwatch) {
+            eyeSwatch.hidden = !chosen;
+            eyeSwatch.className = "eye" + (chosen ? " " + chosen.dataset.tone : "");
+          }
+        }
+
+        eyeTrigger.addEventListener("click", function () { eyeSetOpen(!eyeIsOpen()); });
+
+        eyeOpts.forEach(function (opt, i) {
+          opt.addEventListener("click", function () {
+            eyePick(opt.dataset.value);
+            eyeSetOpen(false);
+            eyeTrigger.focus();
+          });
+          opt.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              opt.click();
+            } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              var nextIdx = e.key === "ArrowDown" ? i + 1 : i - 1;
+              if (eyeOpts[nextIdx]) eyeOpts[nextIdx].focus();
+            } else if (e.key === "Escape") {
+              eyeSetOpen(false);
+              eyeTrigger.focus();
+            }
+          });
+        });
+
+        eyeTrigger.addEventListener("keydown", function (e) {
+          if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            eyeSetOpen(true);
+            var current = eyeOpts.filter(function (o) { return o.getAttribute("aria-selected") === "true"; })[0];
+            (current || eyeOpts[0]).focus();
+          } else if (e.key === "Escape") {
+            eyeSetOpen(false);
+          }
+        });
+
+        document.addEventListener("click", function (e) {
+          if (eyeIsOpen() && !eyePicker.contains(e.target)) eyeSetOpen(false);
+        });
+
+        /* keep the trigger in step with the select when the form is reset */
+        orderForm.addEventListener("reset", function () {
+          setTimeout(function () { eyePick(eyeSelect.value); }, 0);
+        });
+
+        eyePick(eyeSelect.value);
+      }
 
       /* ---------- photo: confirm the upload with a thumbnail card ---------- */
       var photo = orderForm.elements.photo;
@@ -797,8 +884,13 @@
           wrap.classList.add("shake");
           wrap.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-        if (firstBad.type !== "file") {
-          try { firstBad.focus({ preventScroll: true }); } catch (e) { firstBad.focus(); }
+        /* a field drawn by a custom control points at the element to focus */
+        var focusEl = firstBad.dataset.focusTarget
+          ? document.getElementById(firstBad.dataset.focusTarget)
+          : (firstBad.type === "file" ? null : firstBad);
+
+        if (focusEl) {
+          try { focusEl.focus({ preventScroll: true }); } catch (e) { focusEl.focus(); }
         }
         return false;
       }
