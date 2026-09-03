@@ -6,3 +6,8 @@ Thumbs.db
 
 # Python (local preview server)
 __pycache__/
+
+# Cloudflare Wrangler (local state)
+.wrangler/
+server/.wrangler/
+node_modules/

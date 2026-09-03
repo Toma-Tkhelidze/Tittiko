@@ -46,8 +46,8 @@
    2) Bindings → KV namespace:  ცვლადის სახელი  ORDERS
       (ჯერ Storage & Databases → KV → Create → სახელი "tittiko-orders")
 
-   3) Bindings → R2 bucket:     ცვლადის სახელი  PHOTOS
-      (ჯერ R2 → Create bucket → სახელი "tittiko-photos")
+      აქვე ინახება ბავშვის ფოტოც — ცალკე R2 bucket არ გვჭირდება. KV-ის
+      ერთი ჩანაწერი 25 MB-მდე იტევს, ფოტოს ზღვარი კი 10 MB-ია.
 
    ყოველი ცვლილების შემდეგ → Deploy.
    ============================================================================ */
@@ -105,6 +105,7 @@ const MAX_PHOTO_BYTES = 10 * 1024 * 1024;   /* 10 MB — იგივე, რა
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const ORDER_TTL_MINUTES = 30;               /* რამდენ ხანს ელოდება გადაუხდელი შეკვეთა */
 const KEEP_ORDER_DAYS = 90;
+const KEEP_PHOTO_DAYS = 7;                  /* ფოტო Telegram-ში გაგზავნისთანავე აღარ სჭირდება */
 
 /* ============================================================================
    მარშრუტიზაცია
@@ -145,8 +146,8 @@ async function handlePay(request, env, ctx) {
   const allowed = env.ALLOWED_ORIGIN || "*";
 
   /* გასაგები შეცდომა, თუ Cloudflare-ში საცავები ჯერ არ არის მიბმული */
-  if (!env.ORDERS || !env.PHOTOS) {
-    return json({ ok: false, error: "Worker is missing the ORDERS (KV) or PHOTOS (R2) binding" }, 500, allowed);
+  if (!env.ORDERS) {
+    return json({ ok: false, error: "Worker is missing the ORDERS (KV) binding" }, 500, allowed);
   }
 
   if (Number(request.headers.get("Content-Length") || 0) > MAX_BODY_BYTES) {
@@ -233,12 +234,13 @@ async function handlePay(request, env, ctx) {
   order.created_at = new Date().toISOString();
   order.status = "pending";
 
-  /* --- 1.5 ფოტოს შენახვა R2-ში, შეკვეთის — KV-ში --- */
-  const photoKey = "orders/" + orderNo + (photo.type === "image/png" ? ".png" : ".jpg");
+  /* --- 1.5 ფოტოც და შეკვეთაც KV-ში ინახება --- */
+  const photoKey = "photo:" + orderNo;
   order.photo_key = photoKey;
+  order.photo_type = photo.type === "image/png" ? "image/png" : "image/jpeg";
 
-  await env.PHOTOS.put(photoKey, await photo.arrayBuffer(), {
-    httpMetadata: { contentType: photo.type },
+  await env.ORDERS.put(photoKey, await photo.arrayBuffer(), {
+    expirationTtl: 60 * 60 * 24 * KEEP_PHOTO_DAYS,
   });
   await saveOrder(env, order);
 
@@ -470,11 +472,10 @@ async function handleOrderStatus(url, env, allowed) {
 async function notifyTelegram(env, order, header) {
   const caption = buildCaption(order, header);
 
-  /* ფოტო R2-დან */
+  /* ფოტო KV-დან */
   let photo = null;
   try {
-    const obj = await env.PHOTOS.get(order.photo_key);
-    if (obj) photo = await obj.arrayBuffer();
+    if (order.photo_key) photo = await env.ORDERS.get(order.photo_key, "arrayBuffer");
   } catch { /* ფოტოს გარეშეც შეკვეთა უნდა მივიდეს */ }
 
   if (photo) {
@@ -482,7 +483,11 @@ async function notifyTelegram(env, order, header) {
     body.append("chat_id", env.CHAT_ID);
     body.append("parse_mode", "HTML");
     body.append("caption", caption.slice(0, 1024));
-    body.append("photo", new Blob([photo]), order.order_no + ".jpg");
+    body.append(
+      "photo",
+      new Blob([photo], { type: order.photo_type || "image/jpeg" }),
+      order.order_no + (order.photo_type === "image/png" ? ".png" : ".jpg")
+    );
 
     const res = await tg(env, "sendPhoto", body);
 

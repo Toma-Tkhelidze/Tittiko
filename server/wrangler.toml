@@ -1,0 +1,34 @@
+# ============================================================================
+# ტიტიკო — Cloudflare Worker-ის კონფიგი
+# ============================================================================
+#
+# ამ ფაილით worker.js აიტვირთება ბრძანებით (server/ საქაღალდიდან):
+#
+#     npx wrangler deploy
+#
+# ე.ი. დეშბორდზე ხელით ჩასმა (Edit code → paste → Deploy) აღარ არის საჭირო.
+#
+# ერთხელ, პირველ დეპლოიამდე:
+#     npx wrangler login                             # ბრაუზერში ერთი "Allow"
+#     npx wrangler kv namespace create tittiko-orders # id ჩაისვამს ქვემოთ
+#
+# საიდუმლოები (BOT_TOKEN, CHAT_ID, BOG_*) აქ არ იწერება — ისინი Cloudflare-ში
+# ცალკე ინახება და deploy მათ არ შლის. ახლის დასამატებლად:
+#     npx wrangler secret put BOG_CLIENT_ID
+# ============================================================================
+
+name = "shy-sound-1c56"
+main = "worker.js"
+compatibility_date = "2025-05-05"
+workers_dev = true
+
+# ღია ტექსტის ცვლადები — საიდუმლო არაფერია, ამიტომ რეპოზიტორიაში წერია
+[vars]
+ALLOWED_ORIGIN = "https://toma-tkhelidze.github.io"
+SITE_URL = "https://toma-tkhelidze.github.io/Tittiko"
+
+# ერთადერთი საცავი: შეკვეთები (ნომრები, სტატუსები, ბანკის ტოკენის ქეში)
+# და ბავშვის ფოტოებიც — R2 არ გვჭირდება, KV-ის ჩანაწერი 25 MB-მდე იტევს.
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "f80785673ac049448458ab53a2a2c038"
