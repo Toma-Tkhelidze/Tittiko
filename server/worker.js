@@ -240,7 +240,8 @@ async function handlePay(request, env, ctx) {
   order.photo_key = photoKey;
   order.photo_type = photo.type === "image/png" ? "image/png" : "image/jpeg";
 
-  await env.ORDERS.put(photoKey, await photo.arrayBuffer(), {
+  const photoBytes = await photo.arrayBuffer();
+  await env.ORDERS.put(photoKey, photoBytes, {
     expirationTtl: 60 * 60 * 24 * KEEP_PHOTO_DAYS,
   });
   await saveOrder(env, order);
@@ -251,7 +252,9 @@ async function handlePay(request, env, ctx) {
   if (!env.BOG_CLIENT_ID || !env.BOG_CLIENT_SECRET) {
     order.status = "no_payment";
     await saveOrder(env, order);
-    ctx.waitUntil(notifyTelegram(env, order, "⚠️ <b>გადახდის გარეშე</b> — ბანკი ჯერ არ არის ჩართული"));
+    /* ფოტო ჯერ ხელთ გვაქვს — KV-დან ხელახლა კითხვას აზრი არ აქვს და
+       ჩაწერისთანავე წაკითხვა KV-ში ყოველთვის არ ასწრებს */
+    ctx.waitUntil(notifyTelegram(env, order, "⚠️ <b>გადახდის გარეშე</b> — ბანკი ჯერ არ არის ჩართული", photoBytes));
     return json({ ok: true, mode: "telegram", order_no: orderNo }, 200, allowed);
   }
 
@@ -386,16 +389,26 @@ async function handleCallback(request, env, ctx) {
   const order = await getOrder(env, orderNo);
   if (!order) return new Response("ok", { status: 200 });
 
-  /* callback-ს მარტო არ ვენდობით — სტატუსს თვითონ ვეკითხებით ბანკს */
+  /* callback-ს მარტო არ ვენდობით — სტატუსსაც და თანხასაც ბანკს ვეკითხებით */
   let status = "";
+  let paid = null;
   try {
-    status = await bogStatus(env, bogOrderId || order.bog_order_id);
+    const receipt = await bogStatus(env, bogOrderId || order.bog_order_id);
+    status = receipt.status;
+    paid = receipt.amount;
   } catch {
     status = ((info.order_status || {}).key) || "";
   }
 
   order.status = status || "unknown";
   order.paid_at = new Date().toISOString();
+  if (paid != null) order.amount_paid = paid;
+
+  /* ჩამოჭრილი თანხა ჩვენს ჯამს უნდა ემთხვეოდეს. თუ არა — შეკვეთას მაინც
+     გავგზავნით (ფული უკვე გადახდილია, დაკარგვა არ შეიძლება), ოღონდ თვალში
+     საცემი გაფრთხილებით, რომ ხელით გადამოწმდეს. */
+  const mismatch = paid != null && Number(paid) !== Number(order.total);
+  order.amount_mismatch = mismatch;
   await saveOrder(env, order);
 
   if (status !== "completed") {
@@ -407,7 +420,17 @@ async function handleCallback(request, env, ctx) {
   if (already) return new Response("ok", { status: 200 });
   await env.ORDERS.put("sent:" + orderNo, "1", { expirationTtl: 60 * 60 * 24 * KEEP_ORDER_DAYS });
 
-  ctx.waitUntil(notifyTelegram(env, order, "✅ <b>გადახდილია</b>"));
+  const header = mismatch
+    ? "‼️ <b>გადახდილია, თანხა არ ემთხვევა</b> — ბანკმა ჩამოჭრა ₾" + esc(paid) +
+      ", უნდა ყოფილიყო ₾" + esc(order.total) + ". გადაამოწმე ხელით."
+    : "✅ <b>გადახდილია</b>";
+
+  /* თუ Telegram-მა ვერ მიიღო, ნიშანს ვხსნით — ბანკის შემდეგი ცდა ხელახლა
+     გამოგზავნის. უამისოდ გადახდილი შეკვეთა სამუდამოდ იკარგებოდა. */
+  ctx.waitUntil((async () => {
+    const sent = await notifyTelegram(env, order, header);
+    if (!sent) await env.ORDERS.delete("sent:" + orderNo);
+  })());
 
   return new Response("ok", { status: 200 });
 }
@@ -420,8 +443,15 @@ async function bogStatus(env, bogOrderId) {
     headers: { Authorization: "Bearer " + token },
   });
   if (!res.ok) throw new Error("receipt " + res.status);
+
   const data = await res.json();
-  return (data && data.order_status && data.order_status.key) || "";
+  const units = (data && data.purchase_units) || {};
+  const paid = Number(units.transfer_amount);
+
+  return {
+    status: (data && data.order_status && data.order_status.key) || "",
+    amount: Number.isFinite(paid) ? paid : null,
+  };
 }
 
 /* ---------- ხელმოწერის შემოწმება (SHA256withRSA) ---------- */
@@ -504,18 +534,22 @@ async function handleHealth(env, allowed) {
 /* ============================================================================
    Telegram
    ============================================================================ */
-async function notifyTelegram(env, order, header) {
+/* აბრუნებს true-ს, თუ შეკვეთა Telegram-ში მართლა გავიდა.
+   photoBytes არასავალდებულოა — თუ გადმოეცა, KV-ს აღარ ვეკითხებით. */
+async function notifyTelegram(env, order, header, photoBytes) {
   const caption = buildCaption(order, header);
 
   if (!env.BOT_TOKEN || !env.CHAT_ID) {
-    return noteTelegramFailure(env, order, "BOT_TOKEN ან CHAT_ID არ არის დაყენებული");
+    await noteTelegramFailure(env, order, "BOT_TOKEN ან CHAT_ID არ არის დაყენებული");
+    return false;
   }
 
-  /* ფოტო KV-დან */
-  let photo = null;
-  try {
-    if (order.photo_key) photo = await env.ORDERS.get(order.photo_key, "arrayBuffer");
-  } catch { /* ფოტოს გარეშეც შეკვეთა უნდა მივიდეს */ }
+  let photo = photoBytes || null;
+  if (!photo) {
+    try {
+      if (order.photo_key) photo = await env.ORDERS.get(order.photo_key, "arrayBuffer");
+    } catch { /* ფოტოს გარეშეც შეკვეთა უნდა მივიდეს */ }
+  }
 
   let res;
 
@@ -538,7 +572,16 @@ async function notifyTelegram(env, order, header) {
     res = await sendText(env, caption);
   }
 
-  if (!res.ok) await noteTelegramFailure(env, order, res.detail);
+  if (!res.ok) {
+    await noteTelegramFailure(env, order, res.detail);
+    return false;
+  }
+
+  if (order.telegram_error) {
+    delete order.telegram_error;
+    try { await saveOrder(env, order); } catch { /* შემდეგ ცდაზე გასწორდება */ }
+  }
+  return true;
 }
 
 /* Telegram-მა რომ არ მიიღოს, შეკვეთა მაინც შენახულია — მიზეზს იქვე ვაწერთ,
