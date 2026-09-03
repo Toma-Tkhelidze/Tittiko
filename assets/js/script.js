@@ -4,6 +4,13 @@
 (function () {
   "use strict";
 
+  /* ------------------------------------------------------------------
+     Cloudflare Worker-ის მისამართი — ინახავს ბოტის ტოკენს, ბანკის
+     გასაღებებსა და ფასების ცხრილს. ორივე order.html-ის ფორმა და
+     success/fail გვერდები ამას იყენებენ. Worker-ის კოდი: server/worker.js
+     ------------------------------------------------------------------ */
+  var PROXY_URL = "https://shy-sound-1c56.txelidze-toma.workers.dev";
+
   /* ---------- current year in footer ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -411,18 +418,11 @@
      ============================================================ */
   var orderForm = document.getElementById("orderForm");
   if (orderForm) {
-    /* ------------------------------------------------------------------
-       შეკვეთა იგზავნება Cloudflare Worker-ის გავლით, რომელიც ინახავს
-       BOT_TOKEN-სა და CHAT_ID-ს სერვერზე — ისინი ბრაუზერში არ ჩანს.
-       Worker-ის კოდი: server/worker.js  (განთავსების ინსტრუქცია იქვეა)
-       ძველი, გადახდის გარეშე მუშაობდა ვერსია: server/legacy/telegram-worker.js
-
-       ჩასვი შენი Worker-ის მისამართი, ბოლო დახრილი ხაზის გარეშე:
-       ------------------------------------------------------------------ */
-    var PROXY_URL = "https://shy-sound-1c56.txelidze-toma.workers.dev";
-
-    var TG_CAPTION_LIMIT = 1024;   /* sendPhoto caption limit  */
-    var TG_MESSAGE_LIMIT = 4096;   /* sendMessage text limit   */
+    /* შეკვეთა მთლიანად (მონაცემები + ფოტო) POST-დება Worker-ის /pay-ზე
+       (PROXY_URL ფაილის თავშია). Worker ორ რეჟიმში მუშაობს:
+         - ბანკის გასაღებების გარეშე  → შეკვეთა პირდაპირ მიდის Telegram-ში
+         - გასაღებებით                → აბრუნებს ბანკის გვერდის ბმულს და
+                                          მომხმარებელი იქ გადადის გადასახდელად */
 
     var oParams = new URLSearchParams(window.location.search);
     var oIsAnim = oParams.get("type") === "animation";
@@ -476,6 +476,7 @@
       oVal("book_id", oParams.get("id"));
       oVal("price", oItem.price);
       oVal("order_type", oKind);
+      oVal("order_type_key", oIsAnim ? "animation" : "book");   /* Worker-ისთვის — არა საჩვენებელი ტექსტი */
 
       var catLink = document.getElementById("orderCatLink");
       if (catLink) {
@@ -913,92 +914,6 @@
       });
       showStep(0);
 
-      /* ---------- Telegram helpers ---------- */
-
-      /* escape the five characters Telegram's HTML parse_mode cares about */
-      function tgEscape(v) {
-        return String(v == null ? "" : v)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      /* "label: value" line, skipped entirely when the field is empty */
-      function tgLine(label, value) {
-        var v = (value == null ? "" : String(value)).trim();
-        return v ? "<b>" + label + ":</b> " + tgEscape(v) + "\n" : "";
-      }
-
-      function buildCaption() {
-        var f = orderForm.elements;
-        var val = function (name) {
-          var el = f[name];
-          if (!el) return "";
-          if (el.type === "radio" || (el.length && el[0] && el[0].type === "radio")) {
-            var picked = orderForm.querySelector('input[name="' + name + '"]:checked');
-            return picked ? picked.value : "";
-          }
-          return el.value || "";
-        };
-
-        var coverLabel = "";
-        if (!oIsAnim) {
-          var ct = val("cover_type");
-          coverLabel = ct === "soft" ? "რბილი ყდა" : ct === "hard" ? "მაგარი ყდა" : "";
-        }
-
-        var extra = coverExtra();
-
-        var text =
-          "🎁 <b>ახალი შეკვეთა — ტიტიკო</b>\n\n" +
-          tgLine(oKind, oItem.title) +
-          tgLine("ფასი", money(oBasePrice)) +
-          (extra ? tgLine("მაგარი ყდა", "+" + money(extra)) : "") +
-          tgLine("ჯამი", money(oBasePrice + extra)) +
-          "\n<b>👶 ბავშვი</b>\n" +
-          tgLine("სახელი", val("child_name")) +
-          tgLine("მოთხრობითში", val("child_name_story")) +
-          tgLine("ასაკი", val("child_age")) +
-          tgLine("სქესი", val("child_gender")) +
-          tgLine("თმის ფერი", val("hair_color")) +
-          tgLine("კანის ტონი", val("skin_tone")) +
-          tgLine("თვალის ფერი", val("eye_color")) +
-          tgLine("ყდის ტიპი", coverLabel) +
-          tgLine("მიძღვნა", val("dedication")) +
-          "\n<b>📞 შემკვეთი</b>\n" +
-          tgLine("სახელი", val("customer_name")) +
-          tgLine("ტელეფონი", val("phone")) +
-          tgLine("ელ-ფოსტა", val("email")) +
-          tgLine("ქალაქი", val("city")) +
-          tgLine("მისამართი", val("address")) +
-          tgLine("კომენტარი", val("comment"));
-
-        return text.trim();
-      }
-
-      /* the Worker injects chat_id + the bot token, then forwards to Telegram */
-      function tgCall(method, body) {
-        return fetch(PROXY_URL.replace(/\/+$/, "") + "/" + method, { method: "POST", body: body })
-          .then(function (r) { return r.json(); })
-          .then(function (res) {
-            if (!res.ok) throw new Error(res.description || "Telegram API error");
-            return res;
-          });
-      }
-
-      function tgSendMessage(text) {
-        var body = new FormData();
-        body.append("text", text.slice(0, TG_MESSAGE_LIMIT));
-        return tgCall("sendMessage", body);
-      }
-
-      function tgSendPhoto(file, caption) {
-        var body = new FormData();
-        body.append("photo", file);
-        body.append("caption", caption);
-        return tgCall("sendPhoto", body);
-      }
-
       /* ---------- submit ---------- */
       orderForm.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -1025,28 +940,32 @@
           return;
         }
 
-        var caption = buildCaption();
-        var photoFile = photo && photo.files && photo.files[0];
-
         if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "იგზავნება…"; }
         if (status) { status.className = "form-status"; status.textContent = ""; }
 
-        var request;
-        if (photoFile) {
-          /* caption is capped at 1024 chars — if it overflows, send the photo
-             with a short header and the full details as a follow-up message */
-          if (caption.length <= TG_CAPTION_LIMIT) {
-            request = tgSendPhoto(photoFile, caption);
-          } else {
-            request = tgSendPhoto(photoFile, "🎁 <b>ახალი შეკვეთა — " + tgEscape(oItem.title) + "</b>")
-              .then(function () { return tgSendMessage(caption); });
-          }
-        } else {
-          request = tgSendMessage(caption);
-        }
+        /* მთელი ფორმა — ველებიც და ფოტოც — ერთი მოთხოვნით მიდის Worker-ს.
+           ის თვითონ ითვლის ფასს, ინახავს შეკვეთას და, ბანკის გასაღებების
+           მიხედვით, ან პირდაპირ Telegram-ს წერს, ან ბანკის გვერდზე გვაგზავნის. */
+        fetch(PROXY_URL.replace(/\/+$/, "") + "/pay", {
+          method: "POST",
+          body: new FormData(orderForm),
+        })
+          .then(function (r) {
+            return r.json().then(function (data) { return { httpOk: r.ok, data: data }; });
+          })
+          .then(function (res) {
+            var data = res.data || {};
+            if (!res.httpOk || !data.ok) {
+              throw new Error(data.error || "შეკვეთის დამუშავება ვერ მოხერხდა");
+            }
 
-        request
-          .then(function () {
+            /* ბანკი ჩართულია — მომხმარებელი მის დაცულ გვერდზე მიდის გადასახდელად */
+            if (data.mode === "payment" && data.redirect) {
+              window.location.href = data.redirect;
+              return;
+            }
+
+            /* ბანკი ჯერ არ არის ჩართული — შეკვეთა უკვე Telegram-ში მივიდა */
             var wrap = document.getElementById("orderWrap");
             var done = document.getElementById("orderSuccess");
             orderForm.reset();
@@ -1059,11 +978,104 @@
               status.className = "form-status form-status--err";
               status.textContent = "გაგზავნა ვერ მოხერხდა: " + err.message + ". სცადე თავიდან ან დაგვირეკე.";
             }
-          })
-          .then(function () {
             if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
           });
       });
+    }
+  }
+
+  /* ============================================================
+     RESULT PAGE  (success.html · fail.html)
+     ბანკი მომხმარებელს აქ აბრუნებს გადახდის შემდეგ. success.html-ს
+     "fail"-ისგან განასხვავებს data-kind — ორივეს იგივე მარკაპი აქვს.
+     ============================================================ */
+  var resultPage = document.getElementById("resultPage");
+  if (resultPage) {
+    var isFailPage = resultPage.dataset.kind === "fail";
+    var rParams = new URLSearchParams(window.location.search);
+    var rOrderNo = (rParams.get("no") || "").trim();
+
+    var rIcon = document.getElementById("resultIcon");
+    var rTitle = document.getElementById("resultTitle");
+    var rText = document.getElementById("resultText");
+    var rCard = document.getElementById("resultCard");
+    var rOrderNoEl = document.getElementById("resultOrderNo");
+    var rItemEl = document.getElementById("resultItem");
+    var rTotalEl = document.getElementById("resultTotal");
+    var rRetry = document.getElementById("resultRetry");
+
+    function rPaint(icon, title, text) {
+      if (rIcon) rIcon.textContent = icon;
+      if (rTitle) rTitle.textContent = title;
+      if (rText) rText.textContent = text;
+    }
+
+    if (!/^TTK-[A-Za-z0-9-]+$/.test(rOrderNo)) {
+      /* ბმულში შეკვეთის ნომერი აკლია — პირდაპირ ამ გვერდზე მოსვლა, არა ბანკიდან */
+      rPaint(
+        isFailPage ? "😕" : "🤔",
+        isFailPage ? "რაღაც არასწორად წავიდა" : "შეკვეთა ვერ მოიძებნა",
+        "ბმული არასრულია. თუ ბანკიდან ახლახან დაბრუნდით, დაგვიკავშირდით."
+      );
+    } else {
+      if (rOrderNoEl) rOrderNoEl.textContent = rOrderNo;
+      if (isFailPage) {
+        rPaint("😕", "გადახდა ვერ შესრულდა", "თანხა არ ჩამოგჭრილათ. სცადეთ თავიდან, ან სცადეთ სხვა ბარათით.");
+      } else {
+        rPaint("⏳", "მოწმდება…", "გთხოვთ, დაელოდოთ — ვამოწმებთ გადახდის სტატუსს.");
+      }
+
+      /* success.html-ზე Worker-ის callback ხანდახან წამებით იგვიანებს ჩვენს
+         წინ — რამდენჯერმე ვცდით, სანამ საბოლოო შედეგს დავაფიქსირებთ.
+         ცდა ქსელის ცალკეულ შეფერხებაზეც არ უნდა გაჩერდეს, თორემ გვერდი
+         სამუდამოდ "მოწმდება…"-ზე გაიყინება. */
+      var rAttempts = 0;
+      var R_MAX_ATTEMPTS = 5;
+      var R_POLL_MS = 2000;
+
+      function rHandle(data) {
+        var ok = data && data.ok;
+
+        if (ok) {
+          if (rItemEl) rItemEl.textContent = data.item || "—";
+          if (rTotalEl) rTotalEl.textContent = "₾" + data.total;
+          if (rCard) rCard.hidden = false;
+        }
+
+        if (isFailPage) {
+          /* ბანკმა უკვე გვითხრა, რომ ვერ შესრულდა — აქ მხოლოდ იმ
+             პროდუქტისკენ ვამზადებთ "თავიდან ცდა" ბმულს, ცდას აღარ ვიმეორებთ */
+          if (ok && rRetry && data.item_id) {
+            rRetry.href = "order.html?id=" + encodeURIComponent(data.item_id) +
+              (data.is_animation ? "&type=animation" : "");
+          }
+          return;
+        }
+
+        if (ok && data.status === "completed") {
+          rPaint("🎉", "შეკვეთა მიღებულია!", "გმადლობთ! ჩვენი გუნდი მალე დაგიკავშირდებათ დეტალების დასაზუსტებლად.");
+          return;
+        }
+
+        if (rAttempts < R_MAX_ATTEMPTS) {
+          setTimeout(rPoll, R_POLL_MS);
+        } else {
+          /* ბანკმა აქ მხოლოდ წარმატებულ გადახდაზე გვაბრუნებს — callback
+             უბრალოდ იგვიანებს (ან დროებით ვერ ვუკავშირდებით), ამიტომ
+             დაზუსტების მაგივრად ვამშვიდებთ */
+          rPaint("✅", "გადახდა მიღებულია", "შეკვეთის დამუშავება მიმდინარეობს — ჩვენი გუნდი მალე დაგიკავშირდებათ.");
+        }
+      }
+
+      function rPoll() {
+        rAttempts++;
+        fetch(PROXY_URL.replace(/\/+$/, "") + "/order?no=" + encodeURIComponent(rOrderNo))
+          .then(function (r) { return r.json(); })
+          .then(rHandle)
+          .catch(function () { rHandle(null); });
+      }
+
+      rPoll();
     }
   }
 

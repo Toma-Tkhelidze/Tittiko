@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>შეკვეთა მიღებულია — ტიტიკო</title>
+  <meta name="description" content="შენი შეკვეთა და გადახდა დადასტურებულია." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/style.css?v=6" />
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a class="nav__logo" href="index.html" id="navLogo" aria-label="ტიტიკო — მთავარ გვერდზე დაბრუნება">
+        <img src="assets/img/titiko-logo.webp" alt="ტიტიკო" />
+      </a>
+      <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
+        <a href="books.html" class="nav__link">წიგნები</a>
+        <a href="animations.html" class="nav__link">ანიმაციები</a>
+        <a href="index.html#contact" class="nav__link">კონტაქტი</a>
+      </nav>
+      <button class="nav__toggle" id="navToggle" aria-label="მენიუს გახსნა" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+
+        <!-- Worker-ის /order პასუხის მიხედვით ივსება (script.js) -->
+        <div class="order-success" id="resultPage" data-kind="success">
+          <div class="empty-state__emoji" id="resultIcon">⏳</div>
+          <h1 id="resultTitle">მოწმდება…</h1>
+          <p id="resultText">გთხოვთ, დაელოდოთ — ვამოწმებთ გადახდის სტატუსს.</p>
+
+          <div class="summary" id="resultCard" hidden>
+            <div class="summary__row"><span>შეკვეთის ნომერი</span><span id="resultOrderNo">—</span></div>
+            <div class="summary__row"><span>პროდუქტი</span><span id="resultItem">—</span></div>
+            <div class="summary__row summary__total"><span>ჯამი</span><span id="resultTotal">—</span></div>
+          </div>
+
+          <div class="result__actions">
+            <a href="books.html" class="btn btn--primary">წიგნების ნახვა</a>
+            <a href="index.html" class="btn btn--ghost">მთავარზე დაბრუნება</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <img src="assets/img/titiko-logo.webp" alt="ტიტიკო" />
+          <p>პერსონალიზებული წიგნები და ანიმაციები, სადაც მთავარი გმირი შენი ბავშვია.</p>
+        </div>
+        <nav aria-label="ნავიგაცია">
+          <h4>ნავიგაცია</h4>
+          <a href="books.html">წიგნები</a>
+          <a href="animations.html">ანიმაციები</a>
+          <a href="index.html#how">როგორ მუშაობს</a>
+          <a href="index.html#reviews">შეფასებები</a>
+        </nav>
+        <nav aria-label="ინფორმაცია">
+          <h4>ინფორმაცია</h4>
+          <a href="index.html#faq">ხშირი კითხვები</a>
+          <a href="terms.html">წესები და პირობები</a>
+          <a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a>
+          <a href="delivery.html">მიწოდება და დაბრუნება</a>
+        </nav>
+        <div>
+          <h4>კონტაქტი</h4>
+          <a href="mailto:hello@tittiko.ge">hello@tittiko.ge</a>
+          <a href="tel:+995322000000">+995 32 2 000 000</a>
+          <div class="footer__social">
+            <a href="#" aria-label="Facebook">FB</a>
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="TikTok">TT</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bar">
+        <span>🔒 გადახდა დაცულია</span>
+        <span>ტიტიკო — © <span id="year">2026</span> ყველა უფლება დაცულია</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="ზემოთ დაბრუნება">↑</button>
+
+  <script src="assets/js/script.js?v=6"></script>
+</body>
+</html>

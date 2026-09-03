@@ -1072,6 +1072,11 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .order-success h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 12px 0 10px; }
 .order-success p { color: var(--muted); margin-bottom: 22px; }
 
+/* success.html / fail.html reuse .order-success for the panel itself;
+   this is just the button row and the little receipt card under it */
+.result__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 4px; }
+.order-success .summary { text-align: left; margin-top: 0; margin-bottom: 26px; }
+
 @media (max-width: 860px) {
   .order { grid-template-columns: 1fr; }
   .order__aside { position: static; max-width: 340px; margin-inline: auto; }

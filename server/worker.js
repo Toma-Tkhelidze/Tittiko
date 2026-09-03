@@ -458,6 +458,8 @@ async function handleOrderStatus(url, env, allowed) {
     status: order.status,
     total: order.total,
     item: order.item_title,
+    item_id: order.item_id,
+    is_animation: order.kind === "ანიმაცია",
     kind: order.kind,
   }, 200, allowed);
 }
