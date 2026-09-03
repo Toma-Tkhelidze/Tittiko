@@ -134,6 +134,7 @@ export default {
 
     if (path === "/pay" && request.method === "POST") return handlePay(request, env, ctx);
     if (path === "/order" && request.method === "GET") return handleOrderStatus(url, env, allowed);
+    if (path === "/health" && request.method === "GET") return handleHealth(env, allowed);
 
     return json({ ok: false, error: "Not found" }, 404, allowed);
   },
@@ -467,16 +468,56 @@ async function handleOrderStatus(url, env, allowed) {
 }
 
 /* ============================================================================
+   ჯანმრთელობის შემოწმება — GET /health
+   ----------------------------------------------------------------------------
+   არაფერს აგზავნის და საიდუმლოს არ ამჟღავნებს: მხოლოდ ამბობს, რომელი
+   პარამეტრი აკლია და რას პასუხობს Telegram ტოკენსა და ჩატზე. სწორედ ეს
+   გვაკლდა, როცა შეკვეთა უხმოდ ვერ მიდიოდა.
+   ============================================================================ */
+async function handleHealth(env, allowed) {
+  const out = {
+    ok: true,
+    kv_orders: !!env.ORDERS,
+    has_bot_token: !!env.BOT_TOKEN,
+    has_chat_id: !!env.CHAT_ID,
+    has_bank_keys: !!(env.BOG_CLIENT_ID && env.BOG_CLIENT_SECRET),
+    mode: env.BOG_CLIENT_ID && env.BOG_CLIENT_SECRET ? "payment" : "telegram",
+    allowed_origin: env.ALLOWED_ORIGIN || "*",
+    site_url: env.SITE_URL || "",
+  };
+
+  if (env.BOT_TOKEN) {
+    const me = await tg(env, "getMe", null);
+    out.telegram_token = me.ok ? "ok" : me.detail;
+  }
+
+  if (env.BOT_TOKEN && env.CHAT_ID) {
+    const body = new FormData();
+    body.append("chat_id", env.CHAT_ID);
+    const chat = await tg(env, "getChat", body);
+    out.telegram_chat = chat.ok ? "ok" : chat.detail;
+  }
+
+  return json(out, 200, allowed);
+}
+
+/* ============================================================================
    Telegram
    ============================================================================ */
 async function notifyTelegram(env, order, header) {
   const caption = buildCaption(order, header);
+
+  if (!env.BOT_TOKEN || !env.CHAT_ID) {
+    return noteTelegramFailure(env, order, "BOT_TOKEN ან CHAT_ID არ არის დაყენებული");
+  }
 
   /* ფოტო KV-დან */
   let photo = null;
   try {
     if (order.photo_key) photo = await env.ORDERS.get(order.photo_key, "arrayBuffer");
   } catch { /* ფოტოს გარეშეც შეკვეთა უნდა მივიდეს */ }
+
+  let res;
 
   if (photo) {
     const body = new FormData();
@@ -489,14 +530,24 @@ async function notifyTelegram(env, order, header) {
       order.order_no + (order.photo_type === "image/png" ? ".png" : ".jpg")
     );
 
-    const res = await tg(env, "sendPhoto", body);
+    res = await tg(env, "sendPhoto", body);
 
     /* თუ ტექსტი 1024 სიმბოლოს გადააჭარბა, დანარჩენს ცალკე ვგზავნით */
-    if (res && caption.length > 1024) await sendText(env, caption);
-    return;
+    if (res.ok && caption.length > 1024) res = await sendText(env, caption);
+  } else {
+    res = await sendText(env, caption);
   }
 
-  await sendText(env, caption);
+  if (!res.ok) await noteTelegramFailure(env, order, res.detail);
+}
+
+/* Telegram-მა რომ არ მიიღოს, შეკვეთა მაინც შენახულია — მიზეზს იქვე ვაწერთ,
+   რომ `wrangler kv key get order:TTK-0001`-ით გამოჩნდეს, რა მოხდა.
+   უამისოდ გაგზავნის შეცდომა უხმოდ იკარგებოდა. */
+async function noteTelegramFailure(env, order, detail) {
+  console.error("Telegram " + order.order_no + ": " + detail);
+  order.telegram_error = detail;
+  try { await saveOrder(env, order); } catch { /* ლოგი მაინც დარჩა */ }
 }
 
 async function sendText(env, text) {
@@ -507,15 +558,20 @@ async function sendText(env, text) {
   return tg(env, "sendMessage", body);
 }
 
+/* აბრუნებს { ok, detail } — detail-ში Telegram-ის პასუხი წერია, ტოკენის გარეშე */
 async function tg(env, method, body) {
   try {
     const res = await fetch("https://api.telegram.org/bot" + env.BOT_TOKEN + "/" + method, {
       method: "POST",
-      body: body,
+      body: body || undefined,   /* getMe-ს პარამეტრი არ სჭირდება; ცარიელი multipart 400-ს იძლევა */
     });
-    return res.ok;
-  } catch {
-    return false;
+    if (res.ok) return { ok: true, detail: "" };
+
+    let text = "";
+    try { text = (await res.text()).slice(0, 300); } catch { /* სხეული არ წაიკითხა */ }
+    return { ok: false, detail: method + " → HTTP " + res.status + " " + text };
+  } catch (err) {
+    return { ok: false, detail: method + " → " + String(err && err.message ? err.message : err) };
   }
 }
 
