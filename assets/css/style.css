@@ -1082,6 +1082,72 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 }
 
 /* ============================================================
+   LEGAL PAGES  (terms.html · privacy.html · delivery.html)
+   ============================================================ */
+.legal { max-width: 760px; margin: 0 auto; }
+
+.legal__head { margin-bottom: 36px; }
+.legal__head h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); margin-bottom: 12px; }
+.legal__meta { color: var(--muted); font-size: .88rem; font-weight: 600; }
+.legal__intro { margin-top: 18px; color: var(--muted); line-height: 1.75; }
+
+.legal__toc {
+  padding: 20px 22px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  margin-bottom: 40px;
+}
+.legal__toc h2 { font-size: .8rem; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
+.legal__toc ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
+.legal__toc a { color: var(--ink); font-weight: 600; font-size: .93rem; }
+.legal__toc a:hover { color: var(--pink); }
+.legal__toc .n { color: var(--pink); font-weight: 800; margin-right: 7px; font-variant-numeric: tabular-nums; }
+
+.legal__sec { margin-bottom: 38px; scroll-margin-top: calc(var(--nav-offset) + 20px); }
+.legal__sec h2 { font-size: 1.22rem; margin-bottom: 14px; }
+.legal__sec h2 .n { color: var(--pink); margin-right: 9px; font-variant-numeric: tabular-nums; }
+.legal__sec h3 { font-size: 1rem; margin: 20px 0 9px; }
+.legal__sec p { margin-bottom: 13px; line-height: 1.78; }
+.legal__sec p:last-child { margin-bottom: 0; }
+
+.legal__sec ul { list-style: none; padding: 0; margin: 0 0 13px; }
+.legal__sec li { position: relative; padding-inline-start: 22px; margin-bottom: 9px; line-height: 1.7; }
+.legal__sec li::before { content: "—"; position: absolute; inset-inline-start: 0; color: var(--pink); font-weight: 700; }
+
+.legal a:not(.btn):not(.legal__toc a) { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* შესავსები ადგილი — ყვითლად ჩანს, რომ არ დაგვავიწყდეს */
+.tbd {
+  background: #FFF0B8;
+  color: #6b4e00;
+  border-radius: 6px;
+  padding: 1px 7px;
+  font-weight: 700;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.legal__note {
+  padding: 20px 22px;
+  background: var(--lav);
+  border-radius: var(--radius-sm);
+  font-size: .93rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.legal__note strong { color: var(--ink); }
+
+.legal__contact {
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 2px solid var(--line);
+  font-size: .95rem;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.legal__contact strong { color: var(--ink); }
+
+/* ============================================================
    ANIMATIONS
    ============================================================ */
 .anim-grid {
