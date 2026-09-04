@@ -101,6 +101,26 @@ const ANIMATIONS = {
   birthday: { title: "დაბადების დღის სასწაული",    price: 45 },
 };
 
+/* ტექსტური ველების ზღვარი. უამისოდ ერთი შეკვეთა მეგაბაიტებს წერდა KV-ში
+   (ფორმა 12 MB-მდე სხეულს იღებს), Telegram კი ისედაც ჭრის ტექსტს — ე.ი.
+   გრძელი ტექსტი უხმოდ იკარგებოდა. სჯობს, პირდაპირ ვუთხრათ, რომ გრძელია. */
+const FIELD_LIMITS = {
+  child_name: [60, "ბავშვის სახელი"],
+  child_name_story: [60, "სახელი მიცემით ბრუნვაში"],
+  child_age: [20, "ასაკი"],
+  child_gender: [20, "სქესი"],
+  hair_color: [40, "თმის ფერი"],
+  skin_tone: [40, "კანის ტონი"],
+  eye_color: [40, "თვალის ფერი"],
+  dedication: [500, "მიძღვნა"],
+  customer_name: [100, "სახელი და გვარი"],
+  phone: [30, "ტელეფონი"],
+  email: [120, "ელ-ფოსტა"],
+  city: [60, "ქალაქი"],
+  address: [200, "მისამართი"],
+  comment: [500, "კომენტარი"],
+};
+
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;   /* 10 MB — იგივე, რაც ფორმაშია */
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const ORDER_TTL_MINUTES = 30;               /* რამდენ ხანს ელოდება გადაუხდელი შეკვეთა */
@@ -254,11 +274,19 @@ async function handlePay(request, env, ctx) {
     city: isAnim ? "" : str(form.get("city")),
     address: isAnim ? "" : str(form.get("address")),
     comment: str(form.get("comment")),
+
+    /* წესებზე თანხმობა — ფორმა მას ყოველთვის აგზავნის; ვინახავთ, რომ
+       დავას შემთხვევაში დარჩეს კვალი, როდის და რაზე დათანხმდა მყიდველი */
+    agree_terms: str(form.get("agree_terms")) ? "დიახ" : "",
   };
 
   const missing = requiredMissing(order, isAnim);
   if (missing) {
     return json({ ok: false, error: "შეუვსებელი ველი: " + missing }, 400, allowed);
+  }
+  const tooLong = fieldTooLong(order);
+  if (tooLong) {
+    return json({ ok: false, error: "ძალიან გრძელი ტექსტი: " + tooLong }, 400, allowed);
   }
   if (!isEmail(order.email)) {
     return json({ ok: false, error: "ელ-ფოსტა არასწორია" }, 400, allowed);
@@ -324,7 +352,6 @@ async function handlePay(request, env, ctx) {
 
 /* ---------- ბანკთან შეკვეთის შექმნა ---------- */
 async function createBogOrder(env, order, workerOrigin) {
-  const token = await bogToken(env);
   const site = (env.SITE_URL || "").replace(/\/+$/, "");
 
   const basket = [{
@@ -358,12 +385,11 @@ async function createBogOrder(env, order, workerOrigin) {
     capture: "automatic",
   };
 
-  const res = await fetch(BOG_ORDERS_URL, {
+  const res = await bogFetch(env, BOG_ORDERS_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Accept-Language": "ka",
-      Authorization: "Bearer " + token,
     },
     body: JSON.stringify(body),
   });
@@ -383,10 +409,30 @@ async function createBogOrder(env, order, workerOrigin) {
   return link;
 }
 
+/* ---------- ბანკთან მიმართვა ქეშირებული ტოკენით ----------
+   ქეშირებული ტოკენი შეიძლება ბანკმა ვადაზე ადრე გააუქმოს (გასაღების შეცვლა,
+   მხარეს გადატვირთვა). მაშინ ყველა მოთხოვნა 401-ს იღებდა და გადახდა ერთ
+   საათს არ მუშაობდა, სანამ ქეში თავისით არ ამოიწურებოდა. ახლა 401-ზე ქეშს
+   ვშლით და ერთხელ ვიმეორებთ ახალი ტოკენით. */
+async function bogFetch(env, url, init) {
+  const send = async (token) => fetch(url, {
+    ...init,
+    headers: { ...(init && init.headers), Authorization: "Bearer " + token },
+  });
+
+  let res = await send(await bogToken(env));
+  if (res.status === 401 || res.status === 403) {
+    res = await send(await bogToken(env, true));
+  }
+  return res;
+}
+
 /* ---------- ბანკის ტოკენი (1 საათი ცოცხლობს, ვქეშავთ) ---------- */
-async function bogToken(env) {
-  const cached = await env.ORDERS.get("bog_token");
-  if (cached) return cached;
+async function bogToken(env, fresh) {
+  if (!fresh) {
+    const cached = await env.ORDERS.get("bog_token");
+    if (cached) return cached;
+  }
 
   const res = await fetch(BOG_TOKEN_URL, {
     method: "POST",
@@ -436,8 +482,31 @@ async function handleCallback(request, env, ctx) {
 
   if (!orderNo) return new Response("ok", { status: 200 });
 
+  /* შეკვეთა ვერ ვიპოვეთ. KV-ის ჩანაწერი კოლოებს შორის წამებით ვრცელდება,
+     ამიტომ სწრაფად გადახდილი შეკვეთა შეიძლება ჯერ არ ჩანდეს. "ok"-ის
+     დაბრუნება აქ გადახდილ შეკვეთას სამუდამოდ კარგავდა — ბანკი 200-ის
+     შემდეგ აღარ იმეორებს. ახლა ჯერ ვთხოვთ გამეორებას და, თუ რამდენიმე
+     ცდის მერეც არ გამოჩნდა, Telegram-ში ხელით გადასამოწმებლად ვწერთ. */
   const order = await getOrder(env, orderNo);
-  if (!order) return new Response("ok", { status: 200 });
+  if (!order) {
+    const misses = (parseInt((await env.ORDERS.get("miss:" + orderNo)) || "0", 10) || 0) + 1;
+    await env.ORDERS.put("miss:" + orderNo, String(misses), {
+      expirationTtl: 60 * 60 * 24 * KEEP_ORDER_DAYS,
+    });
+
+    if (misses < 3) {
+      return new Response("order not found yet", { status: 503 });
+    }
+
+    ctx.waitUntil(sendText(env,
+      "‼️ <b>გადახდა უცნობ შეკვეთაზე</b>\n" +
+      "შეკვეთა " + esc(orderNo) + " საცავში ვერ მოიძებნა, ბანკი კი გადახდას გვწერს.\n" +
+      "ბანკის ნომერი: " + esc(bogOrderId || "—") + "\n" +
+      "სტატუსი: " + esc(((info.order_status || {}).key) || "—") + "\n" +
+      "გადაამოწმე ხელით ბანკის კაბინეტში."
+    ));
+    return new Response("ok", { status: 200 });
+  }
 
   /* callback-ს მარტო არ ვენდობით — სტატუსსაც და თანხასაც ბანკს ვეკითხებით */
   let status = "";
@@ -450,9 +519,20 @@ async function handleCallback(request, env, ctx) {
     status = ((info.order_status || {}).key) || "";
   }
 
+  /* უკვე დადასტურებულ გადახდას გვიან მოსული callback ვერ ჩამოაქვეითებს —
+     ბანკი ერთსა და იმავე შეკვეთაზე რამდენჯერმე წერს და თანმიმდევრობა
+     გარანტირებული არ არის */
+  if (order.status === "completed" && status !== "completed") {
+    return new Response("ok", { status: 200 });
+  }
+
   order.status = status || "unknown";
   order.paid_at = new Date().toISOString();
   if (paid != null) order.amount_paid = paid;
+
+  /* KV-დან წაკითხული ჩანაწერი შეიძლება ბანკის ნომრის ჩაწერამდელი იყოს —
+     callback-ის ნომერს ვინარჩუნებთ, თორემ ჩაწერით წავშლიდით */
+  if (bogOrderId) order.bog_order_id = bogOrderId;
 
   /* ჩამოჭრილი თანხა ჩვენს ჯამს უნდა ემთხვეოდეს. თუ არა — შეკვეთას მაინც
      გავგზავნით (ფული უკვე გადახდილია, დაკარგვა არ შეიძლება), ოღონდ თვალში
@@ -488,10 +568,7 @@ async function handleCallback(request, env, ctx) {
 /* ---------- სტატუსის დამოუკიდებელი გადამოწმება ---------- */
 async function bogStatus(env, bogOrderId) {
   if (!bogOrderId) throw new Error("no order id");
-  const token = await bogToken(env);
-  const res = await fetch(BOG_RECEIPT_URL + encodeURIComponent(bogOrderId), {
-    headers: { Authorization: "Bearer " + token },
-  });
+  const res = await bogFetch(env, BOG_RECEIPT_URL + encodeURIComponent(bogOrderId), {});
   if (!res.ok) throw new Error("receipt " + res.status);
 
   const data = await res.json();
@@ -651,21 +728,35 @@ async function sendText(env, text) {
   return tg(env, "sendMessage", body);
 }
 
-/* აბრუნებს { ok, detail } — detail-ში Telegram-ის პასუხი წერია, ტოკენის გარეშე */
+/* აბრუნებს { ok, detail } — detail-ში Telegram-ის პასუხი წერია, ტოკენის გარეშე.
+   დროებით ხარვეზზე (ქსელი, 429, 5xx) ერთხელ ვიმეორებთ: შეკვეთის დაკარგვა
+   ერთი წამიერი შეფერხების გამო ძალიან ძვირია. 400-ზე გამეორებას აზრი არ აქვს. */
 async function tg(env, method, body) {
-  try {
-    const res = await fetch("https://api.telegram.org/bot" + env.BOT_TOKEN + "/" + method, {
-      method: "POST",
-      body: body || undefined,   /* getMe-ს პარამეტრი არ სჭირდება; ცარიელი multipart 400-ს იძლევა */
-    });
-    if (res.ok) return { ok: true, detail: "" };
+  let last = { ok: false, detail: method + " → არ გაშვებულა" };
 
-    let text = "";
-    try { text = (await res.text()).slice(0, 300); } catch { /* სხეული არ წაიკითხა */ }
-    return { ok: false, detail: method + " → HTTP " + res.status + " " + text };
-  } catch (err) {
-    return { ok: false, detail: method + " → " + String(err && err.message ? err.message : err) };
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (attempt) await new Promise((r) => setTimeout(r, 700));
+
+    try {
+      const res = await fetch("https://api.telegram.org/bot" + env.BOT_TOKEN + "/" + method, {
+        method: "POST",
+        body: body || undefined, /* getMe-ს პარამეტრი არ სჭირდება; ცარიელი multipart 400-ს იძლევა */
+      });
+      if (res.ok) return { ok: true, detail: "" };
+
+      let text = "";
+      try { text = (await res.text()).slice(0, 300); } catch { /* სხეული არ წაიკითხა */ }
+      last = { ok: false, detail: method + " → HTTP " + res.status + " " + text };
+
+      /* Telegram-მა მოთხოვნა უარყო (არასწორი ტოკენი, ჩატი, ტექსტი) — გამეორება
+         იმავეს დააბრუნებს */
+      if (res.status < 500 && res.status !== 429) return last;
+    } catch (err) {
+      last = { ok: false, detail: method + " → " + String(err && err.message ? err.message : err) };
+    }
   }
+
+  return last;
 }
 
 function buildCaption(order, header) {
@@ -785,6 +876,15 @@ function requiredMissing(order, isAnim) {
   }
   for (const [key, label] of need) {
     if (!order[key]) return label;
+  }
+  return null;
+}
+
+/* აბრუნებს პირველი გადაჭარბებული ველის სახელს (ან null-ს) */
+function fieldTooLong(order) {
+  for (const key of Object.keys(FIELD_LIMITS)) {
+    const [max, label] = FIELD_LIMITS[key];
+    if (String(order[key] || "").length > max) return label;
   }
   return null;
 }

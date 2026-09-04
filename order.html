@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="assets/css/style.css?v=7" />
+  <link rel="stylesheet" href="assets/css/style.css?v=8" />
   <noscript>
     <style>[data-reveal] { opacity: 1 !important; transform: none !important; }</style>
   </noscript>
@@ -275,6 +275,20 @@
                 <span class="field__label">კომენტარი <span class="opt">არასავალდებულო</span></span>
                 <textarea name="comment" rows="2" placeholder="მიწოდების სასურველი დრო, დამატებითი სურვილი…"></textarea>
               </label>
+              <!-- გადახდამდე თანხმობა — ბმულები ახალ ფანჯარაში იხსნება, რომ
+                   შევსებული ფორმა არ დაიკარგოს -->
+              <div class="field field--check" data-error="გასაგრძელებლად დაეთანხმე წესებს და პირობებს">
+                <label class="check">
+                  <input type="checkbox" name="agree_terms" value="დიახ" required />
+                  <span>
+                    ვეთანხმები
+                    <a href="terms.html" target="_blank" rel="noopener">წესებსა და პირობებს</a>,
+                    <a href="delivery.html" target="_blank" rel="noopener">მიწოდებისა და დაბრუნების</a> და
+                    <a href="privacy.html" target="_blank" rel="noopener">კონფიდენციალურობის</a> პოლიტიკას
+                    <span class="req" aria-hidden="true">*</span>
+                  </span>
+                </label>
+              </div>
             </div>
 
             <p class="form-status" id="orderStatus" role="status" aria-live="polite"></p>
@@ -333,6 +347,6 @@
 
   <button class="to-top" id="toTop" aria-label="ზემოთ დაბრუნება">↑</button>
 
-  <script src="assets/js/script.js?v=7"></script>
+  <script src="assets/js/script.js?v=8"></script>
 </body>
 </html>

@@ -826,6 +826,26 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 }
 .field.shake { animation: fieldShake .32s ease; }
 
+/* ---------- consent checkbox (order.html, last step) ----------
+   .field-ის ზოგადი წესები ღილაკს მთელ სიგანეზე გაწელავდა — აქ თავიდან
+   ვწერთ ზომას და ხაზში ტექსტთან ერთად ვდგამთ */
+.field--check { margin-top: 4px; }
+.check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.field--check input[type="checkbox"] {
+  width: 20px;
+  flex: 0 0 20px;
+  height: 20px;
+  margin-top: 1px;
+  padding: 0;
+  border-radius: 6px;
+  accent-color: var(--pink);
+  cursor: pointer;
+}
+.field--check .check > span { font-size: .87rem; font-weight: 600; line-height: 1.55; }
+.field--check a { color: var(--pink); text-decoration: underline; }
+.field--check.is-invalid .check > span { color: var(--err); }
+.field--check.is-invalid input[type="checkbox"] { outline: 2px solid var(--err); outline-offset: 2px; }
+
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .field-row--3 { grid-template-columns: 1fr 1fr 1fr; }
 .field-row .field { margin-bottom: 18px; }

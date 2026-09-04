@@ -608,6 +608,12 @@
           return (wrap && wrap.dataset.error) || "აირჩიე ერთ-ერთი ვარიანტი";
         }
 
+        if (el.type === "checkbox") {
+          if (!el.required || el.checked) return "";
+          var cbWrap = fieldWrap(el);
+          return (cbWrap && cbWrap.dataset.error) || "მონიშნე ეს ველი";
+        }
+
         if (el.type === "file") {
           if (!el.required) return "";
           return (el.files && el.files.length) ? "" : "ატვირთე ბავშვის ფოტო";
@@ -820,6 +826,8 @@
       var backBtn = document.getElementById("wizardBack");
       var nextBtn = document.getElementById("wizardNext");
       var wizardSubmitBtn = document.getElementById("wizardSubmit");
+      var submitBtn = wizardSubmitBtn;
+      var submitLabel = "შეკვეთის გაგზავნა";
       var currentStep = 0;
 
       function showStep(i) {
@@ -920,8 +928,6 @@
         if (currentStep !== steps.length - 1) return;
 
         var status = document.getElementById("orderStatus");
-        var submitBtn = document.getElementById("wizardSubmit");
-        var submitLabel = "შეკვეთის გაგზავნა";
 
         /* re-check every step — a visitor can edit an earlier one and come back */
         for (var si = 0; si < steps.length; si++) {
@@ -980,6 +986,22 @@
             }
             if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
           });
+      });
+
+      /* ---------- ბანკიდან "უკან" დაბრუნება ----------
+         ბრაუზერი გვერდს ქეშიდან აღადგენს ზუსტად ისეთს, როგორიც დავტოვეთ:
+         ღილაკი გამორთული, წარწერა "იგზავნება…" — ე.ი. მიტოვებული გადახდის
+         შემდეგ ხელახლა შეკვეთა შეუძლებელი ხდებოდა. ფოტოს ველს კი ბრაუზერი
+         უსაფრთხოებისთვის ასუფთავებს, ბარათი კი ეკრანზე რჩებოდა და ადამიანს
+         ეგონა, რომ ფოტო ისევ მიბმულია. ორივეს აქ ვასწორებთ. */
+      window.addEventListener("pageshow", function (e) {
+        if (!e.persisted) return;
+
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
+        if (photo && !(photo.files && photo.files.length)) clearPhoto();
+
+        var st = document.getElementById("orderStatus");
+        if (st) { st.textContent = ""; st.className = "form-status"; }
       });
     }
   }
