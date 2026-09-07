@@ -1392,17 +1392,35 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .footer h4 { color: #fff; font-size: 1rem; margin-bottom: 16px; }
 .footer nav a, .footer div a { display: block; padding: 6px 0; font-size: .95rem; transition: color .15s ease; }
 .footer nav a:hover, .footer div a:hover { color: var(--yellow); }
-.footer__social { display: flex; gap: 10px; margin-top: 12px; }
-.footer__social a {
-  width: 40px; height: 40px;
+.footer__social { display: flex; gap: 12px; margin-top: 16px; }
+
+/* სოციალური ღილაკები — ბრენდის რბილი წრეები, ჰოვერზე კი თითოეული
+   თავის ფერს იღებს, რომ ერთი შეხედვით ამოსაცნობი იყოს */
+.footer__social .social {
+  width: 46px;
+  height: 46px;
+  padding: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, .1);
+  color: #fff;
   display: grid;
   place-items: center;
-  font-weight: 800;
-  font-size: .8rem;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .14);
+  transition: transform .22s cubic-bezier(.34, 1.56, .64, 1), background .2s ease, box-shadow .2s ease;
 }
-.footer__social a:hover { background: var(--pink); color: #fff; }
+.footer__social .social svg { width: 21px; height: 21px; fill: currentColor; display: block; }
+.footer__social .social:hover { transform: translateY(-3px); color: #fff; }
+.footer__social .social:active { transform: translateY(-1px) scale(.96); }
+.footer__social .social:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+.social--fb:hover {
+  background: #1877F2;
+  box-shadow: 0 12px 24px rgba(24, 119, 242, .45);
+}
+.social--ig:hover {
+  background: linear-gradient(45deg, #FBAD50 0%, #E1306C 55%, #833AB4 100%);
+  box-shadow: 0 12px 24px rgba(225, 48, 108, .45);
+}
 .footer__bar {
   display: flex;
   flex-wrap: wrap;
@@ -1621,4 +1639,491 @@ p, blockquote, li, a { overflow-wrap: break-word; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
   [data-reveal] { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   HIDDEN — display:flex/grid კლასი UA-ს `[hidden]`-ს ფარავდა, ამიტომ
+   ზოგი დამალული ბლოკი (მაგ. ყდის დანამატის ხაზი შეკვეთის ჯამში)
+   მაინც ჩანდა. ერთი წესი ამას ყველგან ასწორებს.
+   ============================================================ */
+[hidden] { display: none !important; }
+
+/* ============================================================
+   რჩეულები — ნავიგაციის გული
+   ============================================================ */
+.nav__fav {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  color: var(--ink);
+  background: rgba(242, 9, 101, .07);
+  transition: background .18s ease, color .18s ease;
+}
+.nav__fav:hover { background: rgba(242, 9, 101, .16); color: var(--pink); }
+.nav__fav.has-items,
+.nav__fav.is-active { color: var(--pink); background: rgba(242, 9, 101, .13); }
+.nav__fav-ic { font-size: 1.15rem; line-height: 1; }
+.nav__fav-count {
+  min-width: 21px;
+  height: 21px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--pink);
+  color: #fff;
+  font-size: .74rem;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+}
+.nav__fav:not(.has-items) .nav__fav-count { display: none; }
+
+/* ============================================================
+   რჩეულები — გულის ღილაკი ყდაზე
+   ============================================================ */
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  color: #b6aec2;
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(28, 18, 48, .2);
+  transition: transform .18s cubic-bezier(.34, 1.56, .64, 1), color .18s ease, background .18s ease;
+}
+.fav-btn:hover { transform: scale(1.12); color: var(--pink); }
+.fav-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.fav-btn.is-on { color: var(--pink); background: #fff; }
+.fav-btn.is-popping { animation: fav-pop .45s cubic-bezier(.34, 1.56, .64, 1); }
+
+@keyframes fav-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35); }
+  62%  { transform: scale(.93); }
+  100% { transform: scale(1); }
+}
+
+.cover--lg .fav-btn,
+.anim-thumb--lg .fav-btn {
+  top: 16px;
+  right: 16px;
+  width: 46px;
+  height: 46px;
+  font-size: 1.4rem;
+}
+
+/* „პოპულარული“ ბეჯი გულს დაეჯახებოდა — ბრენდის პილს გვერდით ჩამოვიდა */
+.cover__tag { top: auto; right: 18px; bottom: 20px; }
+.cover--lg .cover__tag { right: 28px; bottom: 32px; }
+
+/* ============================================================
+   ბარათის მოკლე აღწერა — ამის გარეშე ყველა ბარათი ერთნაირად იკითხება
+   ============================================================ */
+.book-card.has-short .book-card__meta,
+.anim-card.has-short .book-card__meta { margin-bottom: 8px; }
+.book-card__short {
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.45;
+  margin: 0 0 14px;
+  min-height: 2.9em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* დეკორატიული ▶ (რჩეულების გვერდზე აწყობილ ბარათებზე) */
+.play--static { pointer-events: none; }
+
+/* ანიმაციაზე სახელი ცალკე ბეჯად — სათაურში ჩასმა ქართულად უხერხულია */
+.anim-thumb__who {
+  position: absolute;
+  left: 14px;
+  top: 13px;
+  max-width: calc(100% - 76px);          /* გულს არ დაეჯახოს */
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, .93);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: .72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.anim-thumb--lg .anim-thumb__who { left: 20px; top: 18px; font-size: .84rem; padding: 7px 14px; }
+
+/* ============================================================
+   TOAST — მოკლე დადასტურება
+   ============================================================ */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: min(92vw, 470px);
+  padding: 13px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+  font-size: .92rem;
+  box-shadow: 0 18px 44px rgba(28, 18, 48, .36);
+  opacity: 0;
+  transform: translate(-50%, 18px);
+  pointer-events: none;
+  transition: opacity .22s ease, transform .28s cubic-bezier(.34, 1.4, .64, 1);
+}
+.toast.is-shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast__msg { flex: 1 1 auto; }
+.toast__action {
+  flex-shrink: 0;
+  color: var(--yellow);
+  font-weight: 900;
+  font-size: inherit;
+  white-space: nowrap;
+}
+.toast__action:hover { text-decoration: underline; }
+
+/* ============================================================
+   „ვისთვის ეძებ საჩუქარს?“ — სახელი ყდებზე + ასაკის ფილტრი
+   ============================================================ */
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 28px;
+  padding: 20px clamp(18px, 3vw, 28px);
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  background: var(--pink-wash);
+  box-shadow: inset 0 0 0 2px rgba(242, 9, 101, .13);
+}
+.who__eyebrow { display: block; font-weight: 900; font-size: 1.06rem; }
+.who__sub { color: var(--muted); font-size: .9rem; margin-top: 4px; max-width: 44em; }
+.who__fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+.who__field { display: flex; flex-direction: column; gap: 6px; }
+.who__label {
+  font-weight: 800;
+  font-size: .72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.who__input {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: .92rem;
+  padding: 11px 18px;
+  min-width: 170px;
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 2px var(--line);
+  background: #fff;
+  color: var(--ink);
+  transition: box-shadow .15s ease;
+}
+.who__input::placeholder { color: var(--muted); font-weight: 500; }
+.who__input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--pink); }
+.who__clear {
+  padding: 12px 6px;
+  font-weight: 800;
+  font-size: .86rem;
+  color: var(--pink);
+  text-decoration: underline;
+}
+
+.empty-state__reset { margin-top: 18px; }
+
+/* ============================================================
+   გადასაფურცლი ყდა (book.html) — ყდა და შიგთავსის ნიმუში ერთ ბარათში
+   ============================================================ */
+.flipbook {
+  position: relative;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* ჰორიზონტალური ლენტა მიმაგრებით — თითით გადასრიალება, ტრეკპედი და
+   ინერცია უფასოდ მოგვდის, ღილაკები/კლავიატურა კი JS-ს უჭირავს */
+.flipbook__track {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;          /* გვერდის „უკან“ ჟესტი არ გაუშვას */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-radius: 24px;
+}
+.flipbook__track::-webkit-scrollbar { display: none; }
+/* 3D მხოლოდ ფურცვლისას — გაჩერებულ ბარათზე ფენა არ გვინდა */
+.flipbook__track.is-turning { perspective: 1300px; }
+.flipbook__track:focus { outline: none; }
+.flipbook__track:focus-visible { outline: 3px solid var(--pink); outline-offset: 6px; }
+
+.flipbook.is-ready .flipbook__track { cursor: pointer; }
+
+.flipbook__page {
+  flex: 0 0 100%;
+  max-width: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;                /* ერთი გადასრიალება = ერთი გვერდი */
+  display: flex;
+  /* ჩრდილს ლენტის შიგნით სჭირდება ადგილი — თორემ სქროლის ჩარჩო მოჭრიდა */
+  padding: 12px 16px 28px;
+}
+
+/* ფურცელი — ტრანსფორმი აქ ზის და არა მიმაგრების უჯრაზე, თორემ
+   ბრაუზერს მიმაგრების წერტილი ერევა და სქროლი ხტუნავს */
+.flipbook__sheet {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(242, 9, 101, .2);
+  transform-origin: center center;
+  transition: box-shadow .3s ease;
+}
+/* ფონი მხოლოდ დაწერილ გვერდებს — ყდას თავისი გრადიენტი (cover--cN) აქვს */
+figure.flipbook__sheet {
+  display: grid;
+  grid-template-rows: 1.05fr .95fr;
+  background: #fff;
+}
+
+.flipbook__art {
+  display: grid;
+  place-items: center;
+  font-size: clamp(3rem, 11vw, 5rem);
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .22));
+}
+.is-t1 .flipbook__art { background: linear-gradient(150deg, var(--pink), var(--orange)); }
+.is-t2 .flipbook__art { background: linear-gradient(150deg, var(--yellow), var(--orange-red)); }
+.is-t3 .flipbook__art { background: linear-gradient(150deg, #6a4bd0, var(--pink)); }
+.is-t4 .flipbook__art { background: linear-gradient(150deg, #16b3c7, var(--pink)); }
+
+.flipbook__text {
+  position: relative;
+  display: grid;
+  align-content: center;
+  padding: 22px 26px 40px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  /* ნაკერის ჩრდილი მარცხენა კიდეზე — ნამდვილი წიგნის შეგრძნება */
+  background:
+    linear-gradient(90deg, rgba(28, 18, 48, .07), rgba(28, 18, 48, 0) 22px);
+}
+.flipbook__num {
+  position: absolute;
+  right: 24px;
+  bottom: 16px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 800;
+}
+
+.flipbook__sheet--photo { display: block; }
+.flipbook__sheet--photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- ისრები ---------- */
+.flipbook__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--pink);
+  font-size: 1.6rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 26px rgba(28, 18, 48, .22);
+  transition: transform .18s ease, opacity .18s ease, background .18s ease;
+}
+.flipbook__arrow--prev { left: -14px; }
+.flipbook__arrow--next { right: -14px; }
+.flipbook__arrow:hover { transform: scale(1.1); }
+.flipbook__arrow:active { transform: scale(.94); }
+.flipbook__arrow:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+.flipbook__arrow[disabled] { opacity: 0; pointer-events: none; }
+
+/* გული ჩარჩოზეა და არა ყდაზე — ფურცვლისას ადგილზე რჩება */
+.flipbook > .fav-btn { top: 16px; right: 16px; width: 46px; height: 46px; font-size: 1.4rem; z-index: 5; }
+
+/* ---------- ქვედა ზოლი: წერტილები, მინიშნება, შენიშვნა ---------- */
+.flipbook__foot { max-width: 440px; margin: 6px auto 0; text-align: center; }
+.flipbook__dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.flipbook__dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--line-hover);
+  transition: transform .2s ease, background .2s ease, width .2s ease;
+}
+.flipbook__dot:hover { background: var(--pink); }
+.flipbook__dot.is-on { background: var(--pink); width: 24px; border-radius: var(--radius-pill); }
+.flipbook__dot:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
+
+.flipbook__hint { color: var(--muted); font-size: .86rem; font-weight: 700; }
+.flipbook__note { color: var(--muted); font-size: .8rem; margin-top: 6px; }
+
+@media (max-width: 860px) {
+  .flipbook, .flipbook__foot { max-width: 340px; }
+  .flipbook__text { padding: 18px 20px 34px; font-size: .93rem; }
+}
+
+@media (max-width: 600px) {
+  .flipbook__arrow { width: 40px; height: 40px; margin-top: -20px; font-size: 1.4rem; }
+  .flipbook__arrow--prev { left: -10px; }
+  .flipbook__arrow--next { right: -10px; }
+}
+
+/* მოძრაობის შემცირებისას ფურცელი არ იხრება — JS ტრანსფორმს არ წერს,
+   აქ კი გადასვლას ვამოკლებთ */
+@media (prefers-reduced-motion: reduce) {
+  .flipbook__sheet { transform: none !important; opacity: 1 !important; }
+}
+
+/* ============================================================
+   შეკვეთის აღდგენის შეტყობინება (order.html)
+   ============================================================ */
+.resume {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  background: #fff8e6;
+  box-shadow: inset 0 0 0 2px rgba(252, 201, 24, .55);
+}
+.resume__text { flex: 1 1 240px; font-size: .9rem; font-weight: 600; }
+.resume__text::before { content: "↩ "; font-weight: 900; }
+.resume__reset {
+  font-weight: 800;
+  font-size: .89rem;
+  color: var(--pink);
+  text-decoration: underline;
+}
+
+/* ============================================================
+   რჩეულების გვერდი (favorites.html)
+   ============================================================ */
+.fav-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.fav-shared {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 18px;
+  max-width: 660px;
+  margin: 0 auto 26px;
+  padding: 16px 22px;
+  border-radius: 18px;
+  background: var(--lav);
+  box-shadow: inset 0 0 0 2px rgba(106, 75, 208, .16);
+  text-align: center;
+}
+.fav-shared__text { font-size: .93rem; font-weight: 600; }
+.fav-shared__text::before { content: "🎁 "; }
+.fav-link {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto 26px;
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: 12px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 2px var(--line);
+  background: #fff;
+  color: var(--muted);
+  text-align: center;
+}
+.fav-link:focus { outline: none; box-shadow: inset 0 0 0 2px var(--pink); color: var(--ink); }
+
+/* ============================================================
+   ახალი ბლოკების ადაპტაცია
+   ============================================================ */
+@media (max-width: 900px) {
+  .nav__inner { gap: 10px; }
+  .nav__fav { margin-left: auto; padding: 0 13px; }
+  .who { flex-direction: column; align-items: stretch; }
+  .who__fields { justify-content: space-between; }
+  .who__field { flex: 1 1 150px; }
+  .who__input, .who__field .select { width: 100%; min-width: 0; }
+}
+
+@media (max-width: 600px) {
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 84px;                       /* „ზემოთ“ ღილაკს არ გადაეფაროს */
+    max-width: none;
+    transform: translateY(18px);
+  }
+  .toast.is-shown { transform: translateY(0); }
+  .fav-btn { width: 34px; height: 34px; font-size: 1.02rem; top: 8px; right: 8px; }
+
+  /* ვიწრო ყდაზე „პოპულარული“ და ბრენდის პილი ერთმანეთს ეჯახებოდა —
+     ბეჯი ნაკადში ბრუნდება, სათაური კი ორ ხაზში ეტევა (სრული სახელი
+     ბარათის სათაურშივე წერია, ერთი სანტიმეტრით ქვემოთ) */
+  .book-grid .cover__title { font-size: .92rem; -webkit-line-clamp: 2; }
+  .book-grid .cover__tag {
+    position: static;
+    order: 2;
+    align-self: flex-start;
+    margin-bottom: 6px;
+    font-size: .62rem;
+    padding: 4px 8px;
+  }
+  .book-grid .cover__brand { order: 3; }
+  .book-card__short { font-size: .8rem; min-height: 2.7em; }
+  .fav-tools .btn { width: 100%; }
+}
+
+@media (max-width: 400px) {
+  .nav__fav { height: 40px; padding: 0 11px; }
+  .nav__fav-ic { font-size: 1rem; }
 }

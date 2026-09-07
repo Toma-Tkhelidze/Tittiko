@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>გადახდა ვერ შესრულდა — ტიტიკო</title>
-  <meta name="description" content="გადახდა ვერ დასრულდა — სცადეთ თავიდან." />
+  <title>ჩემი რჩეულები — ტიტიკო</title>
+  <meta name="description" content="შენ მიერ მონიშნული ტიტიკოს წიგნები და ანიმაციები — ერთ სიაში, რომ შემდეგ მარტივად შეუკვეთო ან გაუზიარო." />
   <meta name="robots" content="noindex" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,6 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/style.css?v=16" />
+  <noscript>
+    <style>[data-reveal] { opacity: 1 !important; transform: none !important; }</style>
+  </noscript>
 </head>
 <body>
 
@@ -21,11 +24,13 @@
       <a class="nav__logo" href="index.html" id="navLogo" aria-label="ტიტიკო — მთავარ გვერდზე დაბრუნება">
         <img src="assets/img/titiko-logo.webp" alt="ტიტიკო" />
       </a>
+
       <nav class="nav__menu" id="navMenu" aria-label="მთავარი ნავიგაცია">
         <a href="books.html" class="nav__link">წიგნები</a>
         <a href="animations.html" class="nav__link">ანიმაციები</a>
         <a href="index.html#contact" class="nav__link">კონტაქტი</a>
       </nav>
+
       <button class="nav__toggle" id="navToggle" aria-label="მენიუს გახსნა" aria-expanded="false" aria-controls="navMenu">
         <span></span><span></span><span></span>
       </button>
@@ -33,29 +38,76 @@
   </header>
 
   <main>
-    <section class="section">
+
+    <!-- ============ PAGE HERO ============ -->
+    <section class="page-hero">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+
+      <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumb">
+          <a href="index.html">მთავარი</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">რჩეულები</span>
+        </nav>
+
+        <span class="eyebrow">შენი მოკლე სია</span>
+        <h1>ჩემი რჩეულები</h1>
+        <p class="page-hero__lead" id="favLead"></p>
+      </div>
+    </section>
+
+    <!-- ============ LIST ============ -->
+    <section class="section" id="favPage">
       <div class="container">
 
-        <!-- Worker-ის /order პასუხის მიხედვით ივსება (script.js) -->
-        <div class="order-success" id="resultPage" data-kind="fail">
-          <div class="empty-state__emoji" id="resultIcon">😕</div>
-          <h1 id="resultTitle">გადახდა ვერ შესრულდა</h1>
-          <p id="resultText">თანხა არ ჩამოგჭრილათ. სცადეთ თავიდან, ან სცადეთ სხვა ბარათით.</p>
+        <!-- გაზიარებული სია (?ids=…) -->
+        <div class="fav-shared" id="favShared" hidden>
+          <p class="fav-shared__text">ეს სია შენ გაგიზიარეს — შეგიძლია პირდაპირ შეუკვეთო ან შენს რჩეულებში გადაინახო.</p>
+          <button type="button" class="btn btn--primary btn--sm" id="favSharedAdd" hidden>დაამატე ჩემს რჩეულებში</button>
+          <a href="favorites.html" class="btn btn--ghost btn--sm">ჩემი სიის ნახვა</a>
+        </div>
 
-          <div class="summary" id="resultCard" hidden>
-            <div class="summary__row"><span>შეკვეთის ნომერი</span><span id="resultOrderNo">—</span></div>
-            <div class="summary__row"><span>პროდუქტი</span><span id="resultItem">—</span></div>
-            <div class="summary__row summary__total"><span>ჯამი</span><span id="resultTotal">—</span></div>
-          </div>
+        <!-- ჩემი სიის მოქმედებები -->
+        <div class="fav-tools" id="favTools" hidden>
+          <button type="button" class="btn btn--primary btn--sm" id="favShare">🔗 სიის გაზიარება</button>
+          <button type="button" class="btn btn--ghost btn--sm" id="favClear">სიის გასუფთავება</button>
+        </div>
 
-          <div class="result__actions">
-            <a href="books.html" class="btn btn--primary" id="resultRetry">თავიდან ცდა</a>
-            <a href="index.html#contact" class="btn btn--ghost">დაგვიკავშირდი</a>
+        <label class="sr-only" for="favShareLink">გასაზიარებელი ბმული</label>
+        <input class="fav-link" type="text" id="favShareLink" readonly hidden />
+
+        <div class="book-grid" id="favGrid" hidden></div>
+
+        <div class="empty-state" id="favEmpty" hidden>
+          <div class="empty-state__emoji">🤍</div>
+          <h3>სია ჯერ ცარიელია</h3>
+          <p>
+            კატალოგში ყდის კუთხეში დააჭირე გულს — მოწონებული წიგნები და ანიმაციები
+            აქ შეგროვდება და მერე მშვიდად აირჩევ.
+          </p>
+          <div class="fav-tools" style="margin-top:22px">
+            <a href="books.html" class="btn btn--primary btn--sm">წიგნების ნახვა</a>
+            <a href="animations.html" class="btn btn--ghost btn--sm">ანიმაციების ნახვა</a>
           </div>
         </div>
 
       </div>
     </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta-band" data-reveal>
+      <div class="container">
+        <div class="cta-card">
+          <div class="blob blob--c1"></div>
+          <div class="blob blob--c2"></div>
+          <h2>ვერ გადაწყვიტე რომელი აირჩიო?</h2>
+          <p>გაუზიარე სია ოჯახს — საჩუქრის არჩევა ერთად უფრო მარტივია.</p>
+          <a href="books.html" class="btn btn--yellow">კატალოგში დაბრუნება</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ============ FOOTER ============ -->
@@ -66,6 +118,7 @@
           <img src="assets/img/titiko-logo.webp" alt="ტიტიკო" />
           <p>პერსონალიზებული წიგნები და ანიმაციები, სადაც მთავარი გმირი შენი ბავშვია.</p>
         </div>
+
         <nav aria-label="ნავიგაცია">
           <h4>ნავიგაცია</h4>
           <a href="books.html">წიგნები</a>
@@ -74,6 +127,7 @@
           <a href="index.html#how">როგორ მუშაობს</a>
           <a href="index.html#reviews">შეფასებები</a>
         </nav>
+
         <nav aria-label="ინფორმაცია">
           <h4>ინფორმაცია</h4>
           <a href="index.html#faq">ხშირი კითხვები</a>
@@ -81,6 +135,7 @@
           <a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a>
           <a href="delivery.html">მიწოდება და დაბრუნება</a>
         </nav>
+
         <div>
           <h4>კონტაქტი</h4>
           <a href="mailto:tittikoshop@gmail.com">tittikoshop@gmail.com</a>
@@ -95,6 +150,7 @@
           </div>
         </div>
       </div>
+
       <div class="footer__bar">
         <span>🔒 გადახდა დაცულია</span>
         <span>ტიტიკო — © <span id="year">2026</span> ყველა უფლება დაცულია</span>
