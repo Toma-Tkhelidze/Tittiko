@@ -275,9 +275,10 @@ async function handlePay(request, env, ctx) {
     address: isAnim ? "" : str(form.get("address")),
     comment: str(form.get("comment")),
 
-    /* წესებზე თანხმობა — ფორმა მას ყოველთვის აგზავნის; ვინახავთ, რომ
-       დავას შემთხვევაში დარჩეს კვალი, როდის და რაზე დათანხმდა მყიდველი */
+    /* წესებზე და მშობლის სტატუსზე თანხმობა — ფორმა ორივეს ყოველთვის აგზავნის;
+       ვინახავთ, რომ დავის შემთხვევაში დარჩეს კვალი, როდის და რაზე დათანხმდა მყიდველი */
     agree_terms: str(form.get("agree_terms")) ? "დიახ" : "",
+    agree_guardian: str(form.get("agree_guardian")) ? "დიახ" : "",
   };
 
   const missing = requiredMissing(order, isAnim);
@@ -293,6 +294,17 @@ async function handlePay(request, env, ctx) {
   }
   if (!isGeorgianPhone(order.phone)) {
     return json({ ok: false, error: "ტელეფონის ნომერი არასწორია" }, 400, allowed);
+  }
+  /* ორივე თანხმობის გარეშე შეკვეთა არ მიიღება — ბრაუზერის შემოწმების გვერდის ავლაც
+     რომ მოხერხდეს, აქ მაინც ჩერდება */
+  if (!order.agree_terms) {
+    return json({ ok: false, error: "საჭიროა წესებსა და პირობებზე დათანხმება" }, 400, allowed);
+  }
+  if (!order.agree_guardian) {
+    return json({
+      ok: false,
+      error: "საჭიროა მშობლის/კანონიერი წარმომადგენლის სტატუსის დადასტურება",
+    }, 400, allowed);
   }
 
   /* --- 1.3 ფოტო --- */
