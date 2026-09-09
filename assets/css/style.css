@@ -1138,7 +1138,7 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 .legal__sec li { position: relative; padding-inline-start: 22px; margin-bottom: 9px; line-height: 1.7; }
 .legal__sec li::before { content: "—"; position: absolute; inset-inline-start: 0; color: var(--pink); font-weight: 700; }
 
-.legal a:not(.btn):not(.legal__toc a) { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
+.legal a:not(.btn):not(.contact-btn):not(.contact-pill):not(.legal__toc a) { color: var(--pink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* შესავსები ადგილი — ყვითლად ჩანს, რომ არ დაგვავიწყდეს */
 .tbd {
@@ -1163,13 +1163,83 @@ p, blockquote, li, a { overflow-wrap: break-word; }
 
 .legal__contact {
   margin-top: 44px;
-  padding-top: 26px;
-  border-top: 2px solid var(--line);
+  padding: 26px 28px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--pink-wash);
   font-size: .95rem;
   line-height: 1.8;
   color: var(--muted);
 }
-.legal__contact strong { color: var(--ink); }
+.legal__contact strong {
+  display: block;
+  margin-bottom: 15px;
+  color: var(--ink);
+  font-size: 1.03rem;
+}
+
+/* საკონტაქტო ღილაკები — ბარათის ბოლოს */
+.contact-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.legal .contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 20px 8px 8px;
+  background: var(--white);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease, color .18s ease;
+}
+.legal .contact-btn:hover,
+.legal .contact-btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+.contact-btn__ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: var(--white);
+}
+.contact-btn__ico svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* საკონტაქტო პილი — ტექსტის შიგნით */
+.legal .contact-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 13px 2px 10px;
+  border: 1.5px solid #f9cfe0;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--pink);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+.legal .contact-pill:hover,
+.legal .contact-pill:focus-visible {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--white);
+}
+.contact-pill svg { flex: none; width: 15px; height: 15px; fill: currentColor; }
+
+@media (max-width: 480px) {
+  .legal .contact-btn { width: 100%; }
+  .legal .contact-pill { white-space: normal; }
+}
 
 /* ============================================================
    ANIMATIONS
